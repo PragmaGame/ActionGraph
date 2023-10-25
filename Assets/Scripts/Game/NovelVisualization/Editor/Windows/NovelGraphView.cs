@@ -7,10 +7,10 @@ using UnityEngine.UIElements;
 
 namespace Game.NovelVisualization.Editor
 {
-    public class DSGraphView : GraphView
+    public class NovelGraphView : GraphView
     {
         private NovelEditorWindow editorWindow;
-        private DSSearchWindow searchWindow;
+        private NovelSearchWindow searchWindow;
 
         private MiniMap miniMap;
 
@@ -43,7 +43,7 @@ namespace Game.NovelVisualization.Editor
             }
         }
 
-        public DSGraphView(NovelEditorWindow novelEditorWindow)
+        public NovelGraphView(NovelEditorWindow novelEditorWindow)
         {
             editorWindow = novelEditorWindow;
 
@@ -101,16 +101,16 @@ namespace Game.NovelVisualization.Editor
             this.AddManipulator(new SelectionDragger());
             this.AddManipulator(new RectangleSelector());
 
-            this.AddManipulator(CreateNodeContextualMenu("Add Node (Single Choice)", DSDialogueType.SingleChoice));
-            this.AddManipulator(CreateNodeContextualMenu("Add Node (Multiple Choice)", DSDialogueType.MultipleChoice));
+            this.AddManipulator(CreateNodeContextualMenu("Add Node (Single Transition)", TransitionType.Single));
+            this.AddManipulator(CreateNodeContextualMenu("Add Node (Multiple Transition)", TransitionType.Multiple));
 
             this.AddManipulator(CreateGroupContextualMenu());
         }
 
-        private IManipulator CreateNodeContextualMenu(string actionTitle, DSDialogueType dialogueType)
+        private IManipulator CreateNodeContextualMenu(string actionTitle, TransitionType dialogueType)
         {
             ContextualMenuManipulator contextualMenuManipulator = new ContextualMenuManipulator(
-                menuEvent => menuEvent.menu.AppendAction(actionTitle, actionEvent => AddElement(CreateNode("DialogueName", dialogueType, GetLocalMousePosition(actionEvent.eventInfo.localMousePosition))))
+                menuEvent => menuEvent.menu.AppendAction(actionTitle, actionEvent => AddElement(CreateNode("Key", dialogueType, GetLocalMousePosition(actionEvent.eventInfo.localMousePosition))))
             );
 
             return contextualMenuManipulator;
@@ -119,15 +119,15 @@ namespace Game.NovelVisualization.Editor
         private IManipulator CreateGroupContextualMenu()
         {
             ContextualMenuManipulator contextualMenuManipulator = new ContextualMenuManipulator(
-                menuEvent => menuEvent.menu.AppendAction("Add Group", actionEvent => CreateGroup("DialogueGroup", GetLocalMousePosition(actionEvent.eventInfo.localMousePosition)))
+                menuEvent => menuEvent.menu.AppendAction("Add Group", actionEvent => CreateGroup("Group Key", GetLocalMousePosition(actionEvent.eventInfo.localMousePosition)))
             );
 
             return contextualMenuManipulator;
         }
 
-        public DSGroup CreateGroup(string title, Vector2 position)
+        public CustomGroup CreateGroup(string title, Vector2 position)
         {
-            DSGroup group = new DSGroup(title, position);
+            CustomGroup group = new CustomGroup(title, position);
 
             AddGroup(group);
 
@@ -135,12 +135,12 @@ namespace Game.NovelVisualization.Editor
 
             foreach (GraphElement selectedElement in selection)
             {
-                if (!(selectedElement is DSNode))
+                if (!(selectedElement is CustomNode))
                 {
                     continue;
                 }
 
-                DSNode node = (DSNode) selectedElement;
+                CustomNode node = (CustomNode) selectedElement;
 
                 group.AddElement(node);
             }
@@ -148,11 +148,16 @@ namespace Game.NovelVisualization.Editor
             return group;
         }
 
-        public DSNode CreateNode(string nodeName, DSDialogueType dialogueType, Vector2 position, bool shouldDraw = true)
+        public CustomNode CreateNode(string nodeName, TransitionType dialogueType, Vector2 position, bool shouldDraw = true)
         {
-            Type nodeType = Type.GetType($"DS.Elements.DS{dialogueType}Node");
+            var nodeType = dialogueType switch
+            {
+                TransitionType.Single => typeof(SingleNode),
+                TransitionType.Multiple => typeof(MultipleNode),
+                _ => throw new ArgumentOutOfRangeException(nameof(dialogueType), dialogueType, null)
+            };
 
-            DSNode node = (DSNode) Activator.CreateInstance(nodeType);
+            var node = (CustomNode)Activator.CreateInstance(nodeType);
 
             node.Initialize(nodeName, this, position);
 
@@ -170,16 +175,16 @@ namespace Game.NovelVisualization.Editor
         {
             deleteSelection = (operationName, askUser) =>
             {
-                Type groupType = typeof(DSGroup);
+                Type groupType = typeof(CustomGroup);
                 Type edgeType = typeof(Edge);
 
-                List<DSGroup> groupsToDelete = new List<DSGroup>();
-                List<DSNode> nodesToDelete = new List<DSNode>();
+                List<CustomGroup> groupsToDelete = new List<CustomGroup>();
+                List<CustomNode> nodesToDelete = new List<CustomNode>();
                 List<Edge> edgesToDelete = new List<Edge>();
 
                 foreach (GraphElement selectedElement in selection)
                 {
-                    if (selectedElement is DSNode node)
+                    if (selectedElement is CustomNode node)
                     {
                         nodesToDelete.Add(node);
 
@@ -200,23 +205,23 @@ namespace Game.NovelVisualization.Editor
                         continue;
                     }
 
-                    DSGroup group = (DSGroup) selectedElement;
+                    CustomGroup group = (CustomGroup) selectedElement;
 
                     groupsToDelete.Add(group);
                 }
 
-                foreach (DSGroup groupToDelete in groupsToDelete)
+                foreach (CustomGroup groupToDelete in groupsToDelete)
                 {
-                    List<DSNode> groupNodes = new List<DSNode>();
+                    List<CustomNode> groupNodes = new List<CustomNode>();
 
                     foreach (GraphElement groupElement in groupToDelete.containedElements)
                     {
-                        if (!(groupElement is DSNode))
+                        if (!(groupElement is CustomNode))
                         {
                             continue;
                         }
 
-                        DSNode groupNode = (DSNode) groupElement;
+                        CustomNode groupNode = (CustomNode) groupElement;
 
                         groupNodes.Add(groupNode);
                     }
@@ -230,7 +235,7 @@ namespace Game.NovelVisualization.Editor
 
                 DeleteElements(edgesToDelete);
 
-                foreach (DSNode nodeToDelete in nodesToDelete)
+                foreach (CustomNode nodeToDelete in nodesToDelete)
                 {
                     if (nodeToDelete.Group != null)
                     {
@@ -252,16 +257,16 @@ namespace Game.NovelVisualization.Editor
             {
                 foreach (GraphElement element in elements)
                 {
-                    if (!(element is DSNode))
+                    if (!(element is CustomNode))
                     {
                         continue;
                     }
 
-                    DSGroup dsGroup = (DSGroup) group;
-                    DSNode node = (DSNode) element;
+                    CustomGroup customGroup = (CustomGroup) group;
+                    CustomNode node = (CustomNode) element;
 
                     RemoveUngroupedNode(node);
-                    AddGroupedNode(node, dsGroup);
+                    AddGroupedNode(node, customGroup);
                 }
             };
         }
@@ -272,15 +277,15 @@ namespace Game.NovelVisualization.Editor
             {
                 foreach (GraphElement element in elements)
                 {
-                    if (!(element is DSNode))
+                    if (!(element is CustomNode))
                     {
                         continue;
                     }
 
-                    DSGroup dsGroup = (DSGroup) group;
-                    DSNode node = (DSNode) element;
+                    CustomGroup customGroup = (CustomGroup) group;
+                    CustomNode node = (CustomNode) element;
 
-                    RemoveGroupedNode(node, dsGroup);
+                    RemoveGroupedNode(node, customGroup);
                     AddUngroupedNode(node);
                 }
             };
@@ -290,30 +295,30 @@ namespace Game.NovelVisualization.Editor
         {
             groupTitleChanged = (group, newTitle) =>
             {
-                DSGroup dsGroup = (DSGroup) group;
+                CustomGroup customGroup = (CustomGroup) group;
 
-                dsGroup.title = newTitle.RemoveWhitespaces().RemoveSpecialCharacters();
+                customGroup.title = newTitle.RemoveWhitespaces().RemoveSpecialCharacters();
 
-                if (string.IsNullOrEmpty(dsGroup.title))
+                if (string.IsNullOrEmpty(customGroup.title))
                 {
-                    if (!string.IsNullOrEmpty(dsGroup.OldTitle))
+                    if (!string.IsNullOrEmpty(customGroup.OldTitle))
                     {
                         ++NameErrorsAmount;
                     }
                 }
                 else
                 {
-                    if (string.IsNullOrEmpty(dsGroup.OldTitle))
+                    if (string.IsNullOrEmpty(customGroup.OldTitle))
                     {
                         --NameErrorsAmount;
                     }
                 }
 
-                RemoveGroup(dsGroup);
+                RemoveGroup(customGroup);
 
-                dsGroup.OldTitle = dsGroup.title;
+                customGroup.OldTitle = customGroup.title;
 
-                AddGroup(dsGroup);
+                AddGroup(customGroup);
             };
         }
 
@@ -325,9 +330,9 @@ namespace Game.NovelVisualization.Editor
                 {
                     foreach (Edge edge in changes.edgesToCreate)
                     {
-                        DSNode nextNode = (DSNode) edge.input.node;
+                        CustomNode nextNode = (CustomNode) edge.input.node;
 
-                        DSChoiceSaveData choiceData = (DSChoiceSaveData) edge.output.userData;
+                        TransitionSaveData choiceData = (TransitionSaveData) edge.output.userData;
 
                         choiceData.NodeID = nextNode.ID;
                     }
@@ -346,7 +351,7 @@ namespace Game.NovelVisualization.Editor
 
                         Edge edge = (Edge) element;
 
-                        DSChoiceSaveData choiceData = (DSChoiceSaveData) edge.output.userData;
+                        TransitionSaveData choiceData = (TransitionSaveData) edge.output.userData;
 
                         choiceData.NodeID = "";
                     }
@@ -356,9 +361,9 @@ namespace Game.NovelVisualization.Editor
             };
         }
 
-        public void AddUngroupedNode(DSNode node)
+        public void AddUngroupedNode(CustomNode node)
         {
-            string nodeName = node.DialogueName.ToLower();
+            string nodeName = node.Key.ToLower();
 
             if (!ungroupedNodes.ContainsKey(nodeName))
             {
@@ -371,7 +376,7 @@ namespace Game.NovelVisualization.Editor
                 return;
             }
 
-            List<DSNode> ungroupedNodesList = ungroupedNodes[nodeName].Nodes;
+            List<CustomNode> ungroupedNodesList = ungroupedNodes[nodeName].Nodes;
 
             ungroupedNodesList.Add(node);
 
@@ -387,11 +392,11 @@ namespace Game.NovelVisualization.Editor
             }
         }
 
-        public void RemoveUngroupedNode(DSNode node)
+        public void RemoveUngroupedNode(CustomNode node)
         {
-            string nodeName = node.DialogueName.ToLower();
+            string nodeName = node.Key.ToLower();
 
-            List<DSNode> ungroupedNodesList = ungroupedNodes[nodeName].Nodes;
+            List<CustomNode> ungroupedNodesList = ungroupedNodes[nodeName].Nodes;
 
             ungroupedNodesList.Remove(node);
 
@@ -412,7 +417,7 @@ namespace Game.NovelVisualization.Editor
             }
         }
 
-        private void AddGroup(DSGroup group)
+        private void AddGroup(CustomGroup group)
         {
             string groupName = group.title.ToLower();
 
@@ -427,7 +432,7 @@ namespace Game.NovelVisualization.Editor
                 return;
             }
 
-            List<DSGroup> groupsList = groups[groupName].Groups;
+            List<CustomGroup> groupsList = groups[groupName].Groups;
 
             groupsList.Add(group);
 
@@ -443,11 +448,11 @@ namespace Game.NovelVisualization.Editor
             }
         }
 
-        private void RemoveGroup(DSGroup group)
+        private void RemoveGroup(CustomGroup group)
         {
             string oldGroupName = group.OldTitle.ToLower();
 
-            List<DSGroup> groupsList = groups[oldGroupName].Groups;
+            List<CustomGroup> groupsList = groups[oldGroupName].Groups;
 
             groupsList.Remove(group);
 
@@ -468,9 +473,9 @@ namespace Game.NovelVisualization.Editor
             }
         }
 
-        public void AddGroupedNode(DSNode node, DSGroup group)
+        public void AddGroupedNode(CustomNode node, CustomGroup group)
         {
-            string nodeName = node.DialogueName.ToLower();
+            string nodeName = node.Key.ToLower();
 
             node.Group = group;
 
@@ -490,7 +495,7 @@ namespace Game.NovelVisualization.Editor
                 return;
             }
 
-            List<DSNode> groupedNodesList = groupedNodes[group][nodeName].Nodes;
+            List<CustomNode> groupedNodesList = groupedNodes[group][nodeName].Nodes;
 
             groupedNodesList.Add(node);
 
@@ -506,13 +511,13 @@ namespace Game.NovelVisualization.Editor
             }
         }
 
-        public void RemoveGroupedNode(DSNode node, DSGroup group)
+        public void RemoveGroupedNode(CustomNode node, CustomGroup group)
         {
-            string nodeName = node.DialogueName.ToLower();
+            string nodeName = node.Key.ToLower();
 
             node.Group = null;
 
-            List<DSNode> groupedNodesList = groupedNodes[group][nodeName].Nodes;
+            List<CustomNode> groupedNodesList = groupedNodes[group][nodeName].Nodes;
 
             groupedNodesList.Remove(node);
 
@@ -551,7 +556,7 @@ namespace Game.NovelVisualization.Editor
         {
             if (searchWindow == null)
             {
-                searchWindow = ScriptableObject.CreateInstance<DSSearchWindow>();
+                searchWindow = ScriptableObject.CreateInstance<NovelSearchWindow>();
             }
 
             searchWindow.Initialize(this);

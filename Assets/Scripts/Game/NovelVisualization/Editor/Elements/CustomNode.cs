@@ -8,14 +8,14 @@ using UnityEngine.UIElements;
 
 namespace Game.NovelVisualization.Editor
 {
-    public class DSNode : Node
+    public class CustomNode : Node
     {
         public string ID { get; set; }
-        public string DialogueName { get; set; }
-        public List<DSChoiceSaveData> Choices { get; set; }
-        public string Text { get; set; }
-        public DSDialogueType DialogueType { get; set; }
-        public DSGroup Group { get; set; }
+        public string Key { get; set; }
+        public List<TransitionSaveData> Transitions { get; set; }
+        public string MetaData { get; set; }
+        public TransitionType TransitionType { get; set; }
+        public CustomGroup Group { get; set; }
 
         protected NovelGraphView graphView;
         private Color defaultBackgroundColor;
@@ -28,13 +28,13 @@ namespace Game.NovelVisualization.Editor
             base.BuildContextualMenu(evt);
         }
 
-        public virtual void Initialize(string nodeName, NovelGraphView novelGraphView, Vector2 position)
+        public virtual void Initialize(string key, NovelGraphView novelGraphView, Vector2 position)
         {
             ID = Guid.NewGuid().ToString();
 
-            DialogueName = nodeName;
-            Choices = new List<DSChoiceSaveData>();
-            Text = "Dialogue text.";
+            Key = key;
+            Transitions = new List<TransitionSaveData>();
+            MetaData = string.Empty;
 
             SetPosition(new Rect(position, Vector2.zero));
 
@@ -49,7 +49,7 @@ namespace Game.NovelVisualization.Editor
         {
             /* TITLE CONTAINER */
 
-            TextField dialogueNameTextField = GraphElementUtility.CreateTextField(DialogueName, null, callback =>
+            TextField dialogueNameTextField = GraphElementUtility.CreateTextField(Key, null, callback =>
             {
                 TextField target = (TextField) callback.target;
 
@@ -57,14 +57,14 @@ namespace Game.NovelVisualization.Editor
 
                 if (string.IsNullOrEmpty(target.value))
                 {
-                    if (!string.IsNullOrEmpty(DialogueName))
+                    if (!string.IsNullOrEmpty(Key))
                     {
                         ++graphView.NameErrorsAmount;
                     }
                 }
                 else
                 {
-                    if (string.IsNullOrEmpty(DialogueName))
+                    if (string.IsNullOrEmpty(Key))
                     {
                         --graphView.NameErrorsAmount;
                     }
@@ -74,18 +74,18 @@ namespace Game.NovelVisualization.Editor
                 {
                     graphView.RemoveUngroupedNode(this);
 
-                    DialogueName = target.value;
+                    Key = target.value;
 
                     graphView.AddUngroupedNode(this);
 
                     return;
                 }
 
-                DSGroup currentGroup = Group;
+                CustomGroup currentGroup = Group;
 
                 graphView.RemoveGroupedNode(this, Group);
 
-                DialogueName = target.value;
+                Key = target.value;
 
                 graphView.AddGroupedNode(this, currentGroup);
             });
@@ -100,7 +100,7 @@ namespace Game.NovelVisualization.Editor
 
             /* INPUT CONTAINER */
 
-            Port inputPort = this.CreatePort("Dialogue Connection", Orientation.Horizontal, Direction.Input, Port.Capacity.Multi);
+            Port inputPort = this.CreatePort("Input", Orientation.Horizontal, Direction.Input, Port.Capacity.Multi);
 
             inputContainer.Add(inputPort);
 
@@ -110,9 +110,9 @@ namespace Game.NovelVisualization.Editor
 
             customDataContainer.AddToClassList("ds-node__custom-data-container");
 
-            Foldout textFoldout = GraphElementUtility.CreateFoldout("Dialogue Text");
+            Foldout textFoldout = GraphElementUtility.CreateFoldout("Meta Data");
 
-            TextField textTextField = GraphElementUtility.CreateTextArea(Text, null, callback => Text = callback.newValue);
+            TextField textTextField = GraphElementUtility.CreateTextArea(MetaData, null, callback => MetaData = callback.newValue);
 
             textTextField.AddClasses(
                 "ds-node__text-field",

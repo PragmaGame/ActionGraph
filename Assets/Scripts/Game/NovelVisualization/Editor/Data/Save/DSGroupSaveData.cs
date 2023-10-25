@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace DS.Data.Save
+namespace Game.NovelVisualization.Editor
 {
     [Serializable]
     public class DSGroupSaveData

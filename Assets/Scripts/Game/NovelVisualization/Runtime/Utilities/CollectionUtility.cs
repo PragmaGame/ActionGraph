@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace DS.Utilities
+namespace Game.NovelVisualization.Runtime
 {
     public static class CollectionUtility
     {

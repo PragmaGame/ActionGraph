@@ -1,13 +1,11 @@
 using System.Collections.Generic;
+using Game.NovelVisualization.Runtime;
 using UnityEditor;
 
-namespace DS.Inspectors
+namespace Game.NovelVisualization.Editor
 {
-    using Utilities;
-    using ScriptableObjects;
-
     [CustomEditor(typeof(DSDialogue))]
-    public class DSInspector : Editor
+    public class DSInspector : UnityEditor.Editor
     {
         /* Dialogue Scriptable Objects */
         private SerializedProperty dialogueContainerProperty;
@@ -105,26 +103,26 @@ namespace DS.Inspectors
 
         private void DrawDialogueContainerArea()
         {
-            DSInspectorUtility.DrawHeader("Dialogue Container");
+            GraphInspectorUtility.DrawHeader("Dialogue Container");
 
             dialogueContainerProperty.DrawPropertyField();
 
-            DSInspectorUtility.DrawSpace();
+            GraphInspectorUtility.DrawSpace();
         }
 
         private void DrawFiltersArea()
         {
-            DSInspectorUtility.DrawHeader("Filters");
+            GraphInspectorUtility.DrawHeader("Filters");
 
             groupedDialoguesProperty.DrawPropertyField();
             startingDialoguesOnlyProperty.DrawPropertyField();
 
-            DSInspectorUtility.DrawSpace();
+            GraphInspectorUtility.DrawSpace();
         }
 
         private void DrawDialogueGroupArea(DSDialogueContainerSO dialogueContainer, List<string> dialogueGroupNames)
         {
-            DSInspectorUtility.DrawHeader("Dialogue Group");
+            GraphInspectorUtility.DrawHeader("Dialogue Group");
 
             int oldSelectedDialogueGroupIndex = selectedDialogueGroupIndexProperty.intValue;
 
@@ -136,22 +134,22 @@ namespace DS.Inspectors
 
             UpdateIndexOnNamesListUpdate(dialogueGroupNames, selectedDialogueGroupIndexProperty, oldSelectedDialogueGroupIndex, oldDialogueGroupName, isOldDialogueGroupNull);
 
-            selectedDialogueGroupIndexProperty.intValue = DSInspectorUtility.DrawPopup("Dialogue Group", selectedDialogueGroupIndexProperty, dialogueGroupNames.ToArray());
+            selectedDialogueGroupIndexProperty.intValue = GraphInspectorUtility.DrawPopup("Dialogue Group", selectedDialogueGroupIndexProperty, dialogueGroupNames.ToArray());
 
             string selectedDialogueGroupName = dialogueGroupNames[selectedDialogueGroupIndexProperty.intValue];
 
-            DSDialogueGroupSO selectedDialogueGroup = DSIOUtility.LoadAsset<DSDialogueGroupSO>($"Assets/DialogueSystem/Dialogues/{dialogueContainer.FileName}/Groups/{selectedDialogueGroupName}", selectedDialogueGroupName);
+            DSDialogueGroupSO selectedDialogueGroup = GraphIOUtility.LoadAsset<DSDialogueGroupSO>($"Assets/DialogueSystem/Dialogues/{dialogueContainer.FileName}/Groups/{selectedDialogueGroupName}", selectedDialogueGroupName);
 
             dialogueGroupProperty.objectReferenceValue = selectedDialogueGroup;
 
-            DSInspectorUtility.DrawDisabledFields(() => dialogueGroupProperty.DrawPropertyField());
+            GraphInspectorUtility.DrawDisabledFields(() => dialogueGroupProperty.DrawPropertyField());
 
-            DSInspectorUtility.DrawSpace();
+            GraphInspectorUtility.DrawSpace();
         }
 
         private void DrawDialogueArea(List<string> dialogueNames, string dialogueFolderPath)
         {
-            DSInspectorUtility.DrawHeader("Dialogue");
+            GraphInspectorUtility.DrawHeader("Dialogue");
 
             int oldSelectedDialogueIndex = selectedDialogueIndexProperty.intValue;
 
@@ -163,24 +161,24 @@ namespace DS.Inspectors
 
             UpdateIndexOnNamesListUpdate(dialogueNames, selectedDialogueIndexProperty, oldSelectedDialogueIndex, oldDialogueName, isOldDialogueNull);
 
-            selectedDialogueIndexProperty.intValue = DSInspectorUtility.DrawPopup("Dialogue", selectedDialogueIndexProperty, dialogueNames.ToArray());
+            selectedDialogueIndexProperty.intValue = GraphInspectorUtility.DrawPopup("Dialogue", selectedDialogueIndexProperty, dialogueNames.ToArray());
 
             string selectedDialogueName = dialogueNames[selectedDialogueIndexProperty.intValue];
 
-            DSDialogueSO selectedDialogue = DSIOUtility.LoadAsset<DSDialogueSO>(dialogueFolderPath, selectedDialogueName);
+            DSDialogueSO selectedDialogue = GraphIOUtility.LoadAsset<DSDialogueSO>(dialogueFolderPath, selectedDialogueName);
 
             dialogueProperty.objectReferenceValue = selectedDialogue;
 
-            DSInspectorUtility.DrawDisabledFields(() => dialogueProperty.DrawPropertyField());
+            GraphInspectorUtility.DrawDisabledFields(() => dialogueProperty.DrawPropertyField());
         }
 
         private void StopDrawing(string reason, MessageType messageType = MessageType.Info)
         {
-            DSInspectorUtility.DrawHelpBox(reason, messageType);
+            GraphInspectorUtility.DrawHelpBox(reason, messageType);
 
-            DSInspectorUtility.DrawSpace();
+            GraphInspectorUtility.DrawSpace();
 
-            DSInspectorUtility.DrawHelpBox("You need to select a Dialogue for this component to work properly at Runtime!", MessageType.Warning);
+            GraphInspectorUtility.DrawHelpBox("You need to select a Dialogue for this component to work properly at Runtime!", MessageType.Warning);
 
             serializedObject.ApplyModifiedProperties();
         }

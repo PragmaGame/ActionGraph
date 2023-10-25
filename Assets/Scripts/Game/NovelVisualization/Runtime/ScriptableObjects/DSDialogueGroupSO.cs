@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace DS.ScriptableObjects
+namespace Game.NovelVisualization.Runtime
 {
     public class DSDialogueGroupSO : ScriptableObject
     {

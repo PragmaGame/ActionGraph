@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace DS.Data.Error
+namespace Game.NovelVisualization.Editor
 {
     public class DSErrorData
     {

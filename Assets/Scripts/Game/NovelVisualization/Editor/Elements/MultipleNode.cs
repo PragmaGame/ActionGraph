@@ -5,20 +5,20 @@ using UnityEngine.UIElements;
 
 namespace Game.NovelVisualization.Editor
 {
-    public class CustomMultipleChoiceNode : CustomNode
+    public class MultipleNode : CustomNode
     {
-        public override void Initialize(string nodeName, NovelGraphView novelGraphView, Vector2 position)
+        public override void Initialize(string key, NovelGraphView novelGraphView, Vector2 position)
         {
-            base.Initialize(nodeName, novelGraphView, position);
+            base.Initialize(key, novelGraphView, position);
 
-            DialogueType = TransitionType.Multiple;
+            TransitionType = TransitionType.Multiple;
 
-            DSChoiceSaveData choiceData = new DSChoiceSaveData()
+            TransitionSaveData choiceData = new TransitionSaveData()
             {
-                Text = "New Choice"
+                Text = "New Transition"
             };
 
-            Choices.Add(choiceData);
+            Transitions.Add(choiceData);
         }
 
         public override void Draw()
@@ -27,27 +27,27 @@ namespace Game.NovelVisualization.Editor
 
             /* MAIN CONTAINER */
 
-            Button addChoiceButton = GraphElementUtility.CreateButton("Add Choice", () =>
+            Button addTransitionButton = GraphElementUtility.CreateButton("Add Transition", () =>
             {
-                DSChoiceSaveData choiceData = new DSChoiceSaveData()
+                TransitionSaveData choiceData = new TransitionSaveData()
                 {
-                    Text = "New Choice"
+                    Text = "New Transition"
                 };
 
-                Choices.Add(choiceData);
+                Transitions.Add(choiceData);
 
                 Port choicePort = CreateChoicePort(choiceData);
 
                 outputContainer.Add(choicePort);
             });
 
-            addChoiceButton.AddToClassList("ds-node__button");
+            addTransitionButton.AddToClassList("ds-node__button");
 
-            mainContainer.Insert(1, addChoiceButton);
+            mainContainer.Insert(1, addTransitionButton);
 
             /* OUTPUT CONTAINER */
 
-            foreach (DSChoiceSaveData choice in Choices)
+            foreach (TransitionSaveData choice in Transitions)
             {
                 Port choicePort = CreateChoicePort(choice);
 
@@ -59,46 +59,46 @@ namespace Game.NovelVisualization.Editor
 
         private Port CreateChoicePort(object userData)
         {
-            Port choicePort = this.CreatePort();
+            var transitionPort = this.CreatePort();
 
-            choicePort.userData = userData;
+            transitionPort.userData = userData;
 
-            DSChoiceSaveData choiceData = (DSChoiceSaveData) userData;
+            TransitionSaveData transitionData = (TransitionSaveData) userData;
 
-            Button deleteChoiceButton = GraphElementUtility.CreateButton("X", () =>
+            Button deleteTransitionButton = GraphElementUtility.CreateButton("X", () =>
             {
-                if (Choices.Count == 1)
+                if (Transitions.Count == 1)
                 {
                     return;
                 }
 
-                if (choicePort.connected)
+                if (transitionPort.connected)
                 {
-                    graphView.DeleteElements(choicePort.connections);
+                    graphView.DeleteElements(transitionPort.connections);
                 }
 
-                Choices.Remove(choiceData);
+                Transitions.Remove(transitionData);
 
-                graphView.RemoveElement(choicePort);
+                graphView.RemoveElement(transitionPort);
             });
 
-            deleteChoiceButton.AddToClassList("ds-node__button");
+            deleteTransitionButton.AddToClassList("ds-node__button");
 
-            TextField choiceTextField = GraphElementUtility.CreateTextField(choiceData.Text, null, callback =>
+            TextField transitionTextField = GraphElementUtility.CreateTextField(transitionData.Text, null, callback =>
             {
-                choiceData.Text = callback.newValue;
+                transitionData.Text = callback.newValue;
             });
 
-            choiceTextField.AddClasses(
+            transitionTextField.AddClasses(
                 "ds-node__text-field",
                 "ds-node__text-field__hidden",
                 "ds-node__choice-text-field"
             );
 
-            choicePort.Add(choiceTextField);
-            choicePort.Add(deleteChoiceButton);
+            transitionPort.Add(transitionTextField);
+            transitionPort.Add(deleteTransitionButton);
 
-            return choicePort;
+            return transitionPort;
         }
     }
 }

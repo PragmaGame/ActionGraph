@@ -1,9 +1,7 @@
 using UnityEngine;
 
-namespace DS
+namespace Game.NovelVisualization.Runtime
 {
-    using ScriptableObjects;
-
     public class DSDialogue : MonoBehaviour
     {
         /* Dialogue Scriptable Objects */

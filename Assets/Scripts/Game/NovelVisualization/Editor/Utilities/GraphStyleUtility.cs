@@ -3,7 +3,7 @@ using UnityEngine.UIElements;
 
 namespace Game.NovelVisualization.Editor
 {
-    public static class DSStyleUtility
+    public static class GraphStyleUtility
     {
         public static VisualElement AddClasses(this VisualElement element, params string[] classNames)
         {

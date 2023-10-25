@@ -1,8 +1,8 @@
 namespace Game.NovelVisualization.Runtime
 {
-    public enum DSDialogueType
+    public enum TransitionType
     {
-        SingleChoice,
-        MultipleChoice
+        Single,
+        Multiple
     }
 }

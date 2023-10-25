@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Game.NovelVisualization.Editor
 {
-    public class DSSearchWindow : ScriptableObject, ISearchWindowProvider
+    public class NovelSearchWindow : ScriptableObject, ISearchWindowProvider
     {
         private NovelGraphView graphView;
         private Texture2D indentationIcon;
@@ -27,12 +27,12 @@ namespace Game.NovelVisualization.Editor
                 new SearchTreeGroupEntry(new GUIContent("Dialogue Nodes"), 1),
                 new SearchTreeEntry(new GUIContent("Single Choice", indentationIcon))
                 {
-                    userData = DSDialogueType.SingleChoice,
+                    userData = TransitionType.Single,
                     level = 2
                 },
                 new SearchTreeEntry(new GUIContent("Multiple Choice", indentationIcon))
                 {
-                    userData = DSDialogueType.MultipleChoice,
+                    userData = TransitionType.Multiple,
                     level = 2
                 },
                 new SearchTreeGroupEntry(new GUIContent("Dialogue Groups"), 1),
@@ -52,20 +52,20 @@ namespace Game.NovelVisualization.Editor
 
             switch (SearchTreeEntry.userData)
             {
-                case DSDialogueType.SingleChoice:
+                case TransitionType.Single:
                 {
-                    DSSingleChoiceNode singleChoiceNode = (DSSingleChoiceNode) graphView.CreateNode("DialogueName", DSDialogueType.SingleChoice, localMousePosition);
+                    SingleNode singleNode = (SingleNode) graphView.CreateNode("DialogueName", TransitionType.Single, localMousePosition);
 
-                    graphView.AddElement(singleChoiceNode);
+                    graphView.AddElement(singleNode);
 
                     return true;
                 }
 
-                case DSDialogueType.MultipleChoice:
+                case TransitionType.Multiple:
                 {
-                    DSMultipleChoiceNode multipleChoiceNode = (DSMultipleChoiceNode) graphView.CreateNode("DialogueName", DSDialogueType.MultipleChoice, localMousePosition);
+                    MultipleNode multipleNode = (MultipleNode) graphView.CreateNode("DialogueName", TransitionType.Multiple, localMousePosition);
 
-                    graphView.AddElement(multipleChoiceNode);
+                    graphView.AddElement(multipleNode);
 
                     return true;
                 }

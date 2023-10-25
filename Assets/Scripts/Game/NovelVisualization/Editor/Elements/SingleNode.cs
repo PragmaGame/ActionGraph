@@ -4,20 +4,20 @@ using UnityEngine;
 
 namespace Game.NovelVisualization.Editor
 {
-    public class CustomSingleChoiceNode : CustomNode
+    public class SingleNode : CustomNode
     {
-        public override void Initialize(string nodeName, NovelGraphView novelGraphView, Vector2 position)
+        public override void Initialize(string key, NovelGraphView novelGraphView, Vector2 position)
         {
-            base.Initialize(nodeName, novelGraphView, position);
+            base.Initialize(key, novelGraphView, position);
 
-            DialogueType = TransitionType.Single;
+            TransitionType = TransitionType.Single;
 
-            DSChoiceSaveData choiceData = new DSChoiceSaveData()
+            TransitionSaveData transitionData = new TransitionSaveData()
             {
-                Text = "Next Dialogue"
+                Text = "Next Transition"
             };
 
-            Choices.Add(choiceData);
+            Transitions.Add(transitionData);
         }
 
         public override void Draw()
@@ -26,7 +26,7 @@ namespace Game.NovelVisualization.Editor
 
             /* OUTPUT CONTAINER */
 
-            foreach (DSChoiceSaveData choice in Choices)
+            foreach (TransitionSaveData choice in Transitions)
             {
                 Port choicePort = this.CreatePort(choice.Text);
 

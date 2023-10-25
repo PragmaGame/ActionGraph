@@ -1,7 +1,8 @@
 using System.Collections.Generic;
+using Game.NovelVisualization.Runtime;
 using UnityEngine;
 
-namespace DS.Data.Save
+namespace Game.NovelVisualization.Editor
 {
     public class DSGraphSaveDataSO : ScriptableObject
     {

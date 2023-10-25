@@ -1,10 +1,8 @@
 using System;
 using UnityEngine;
 
-namespace DS.Data
+namespace Game.NovelVisualization.Runtime
 {
-    using ScriptableObjects;
-
     [Serializable]
     public class DSDialogueChoiceData
     {

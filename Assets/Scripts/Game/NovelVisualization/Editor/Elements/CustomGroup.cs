@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Game.NovelVisualization.Editor
 {
-    public class DSGroup : Group
+    public class CustomGroup : Group
     {
         public string ID { get; set; }
         public string OldTitle { get; set; }
@@ -12,7 +12,7 @@ namespace Game.NovelVisualization.Editor
         private Color defaultBorderColor;
         private float defaultBorderWidth;
 
-        public DSGroup(string groupTitle, Vector2 position)
+        public CustomGroup(string groupTitle, Vector2 position)
         {
             ID = Guid.NewGuid().ToString();
 

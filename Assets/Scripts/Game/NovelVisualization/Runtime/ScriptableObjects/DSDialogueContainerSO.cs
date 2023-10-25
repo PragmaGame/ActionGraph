@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace DS.ScriptableObjects
+namespace Game.NovelVisualization.Runtime
 {
     public class DSDialogueContainerSO : ScriptableObject
     {

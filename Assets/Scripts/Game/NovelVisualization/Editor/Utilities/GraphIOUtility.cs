@@ -8,21 +8,21 @@ using UnityEngine;
 
 namespace Game.NovelVisualization.Editor
 {
-    public static class DSIOUtility
+    public static class GraphIOUtility
     {
         private static NovelGraphView graphView;
 
         private static string graphFileName;
         private static string containerFolderPath;
 
-        private static List<DSNode> nodes;
-        private static List<DSGroup> groups;
+        private static List<CustomNode> nodes;
+        private static List<CustomGroup> groups;
 
         private static Dictionary<string, DSDialogueGroupSO> createdDialogueGroups;
         private static Dictionary<string, DSDialogueSO> createdDialogues;
 
-        private static Dictionary<string, DSGroup> loadedGroups;
-        private static Dictionary<string, DSNode> loadedNodes;
+        private static Dictionary<string, CustomGroup> loadedGroups;
+        private static Dictionary<string, CustomNode> loadedNodes;
 
         public static void Initialize(NovelGraphView novelGraphView, string graphName)
         {
@@ -31,14 +31,14 @@ namespace Game.NovelVisualization.Editor
             graphFileName = graphName;
             containerFolderPath = $"Assets/DialogueSystem/Dialogues/{graphName}";
 
-            nodes = new List<DSNode>();
-            groups = new List<DSGroup>();
+            nodes = new List<CustomNode>();
+            groups = new List<CustomGroup>();
 
             createdDialogueGroups = new Dictionary<string, DSDialogueGroupSO>();
             createdDialogues = new Dictionary<string, DSDialogueSO>();
 
-            loadedGroups = new Dictionary<string, DSGroup>();
-            loadedNodes = new Dictionary<string, DSNode>();
+            loadedGroups = new Dictionary<string, CustomGroup>();
+            loadedNodes = new Dictionary<string, CustomNode>();
         }
 
         public static void Save()
@@ -66,7 +66,7 @@ namespace Game.NovelVisualization.Editor
         {
             List<string> groupNames = new List<string>();
 
-            foreach (DSGroup group in groups)
+            foreach (CustomGroup group in groups)
             {
                 SaveGroupToGraph(group, graphData);
                 SaveGroupToScriptableObject(group, dialogueContainer);
@@ -77,7 +77,7 @@ namespace Game.NovelVisualization.Editor
             UpdateOldGroups(groupNames, graphData);
         }
 
-        private static void SaveGroupToGraph(DSGroup group, DSGraphSaveDataSO graphData)
+        private static void SaveGroupToGraph(CustomGroup group, DSGraphSaveDataSO graphData)
         {
             DSGroupSaveData groupData = new DSGroupSaveData()
             {
@@ -89,7 +89,7 @@ namespace Game.NovelVisualization.Editor
             graphData.Groups.Add(groupData);
         }
 
-        private static void SaveGroupToScriptableObject(DSGroup group, DSDialogueContainerSO dialogueContainer)
+        private static void SaveGroupToScriptableObject(CustomGroup group, DSDialogueContainerSO dialogueContainer)
         {
             string groupName = group.title;
 
@@ -127,19 +127,19 @@ namespace Game.NovelVisualization.Editor
             SerializableDictionary<string, List<string>> groupedNodeNames = new SerializableDictionary<string, List<string>>();
             List<string> ungroupedNodeNames = new List<string>();
 
-            foreach (DSNode node in nodes)
+            foreach (CustomNode node in nodes)
             {
                 SaveNodeToGraph(node, graphData);
                 SaveNodeToScriptableObject(node, dialogueContainer);
 
                 if (node.Group != null)
                 {
-                    groupedNodeNames.AddItem(node.Group.title, node.DialogueName);
+                    groupedNodeNames.AddItem(node.Group.title, node.Key);
 
                     continue;
                 }
 
-                ungroupedNodeNames.Add(node.DialogueName);
+                ungroupedNodeNames.Add(node.Key);
             }
 
             UpdateDialoguesChoicesConnections();
@@ -148,46 +148,46 @@ namespace Game.NovelVisualization.Editor
             UpdateOldUngroupedNodes(ungroupedNodeNames, graphData);
         }
 
-        private static void SaveNodeToGraph(DSNode node, DSGraphSaveDataSO graphData)
+        private static void SaveNodeToGraph(CustomNode node, DSGraphSaveDataSO graphData)
         {
-            List<DSChoiceSaveData> choices = CloneNodeChoices(node.Choices);
+            List<TransitionSaveData> choices = CloneNodeChoices(node.Transitions);
 
             DSNodeSaveData nodeData = new DSNodeSaveData()
             {
                 ID = node.ID,
-                Name = node.DialogueName,
+                Name = node.Key,
                 Choices = choices,
-                Text = node.Text,
+                Text = node.MetaData,
                 GroupID = node.Group?.ID,
-                DialogueType = node.DialogueType,
+                DialogueType = node.TransitionType,
                 Position = node.GetPosition().position
             };
 
             graphData.Nodes.Add(nodeData);
         }
 
-        private static void SaveNodeToScriptableObject(DSNode node, DSDialogueContainerSO dialogueContainer)
+        private static void SaveNodeToScriptableObject(CustomNode node, DSDialogueContainerSO dialogueContainer)
         {
             DSDialogueSO dialogue;
 
             if (node.Group != null)
             {
-                dialogue = CreateAsset<DSDialogueSO>($"{containerFolderPath}/Groups/{node.Group.title}/Dialogues", node.DialogueName);
+                dialogue = CreateAsset<DSDialogueSO>($"{containerFolderPath}/Groups/{node.Group.title}/Dialogues", node.Key);
 
                 dialogueContainer.DialogueGroups.AddItem(createdDialogueGroups[node.Group.ID], dialogue);
             }
             else
             {
-                dialogue = CreateAsset<DSDialogueSO>($"{containerFolderPath}/Global/Dialogues", node.DialogueName);
+                dialogue = CreateAsset<DSDialogueSO>($"{containerFolderPath}/Global/Dialogues", node.Key);
 
                 dialogueContainer.UngroupedDialogues.Add(dialogue);
             }
 
             dialogue.Initialize(
-                node.DialogueName,
-                node.Text,
-                ConvertNodeChoicesToDialogueChoices(node.Choices),
-                node.DialogueType,
+                node.Key,
+                node.MetaData,
+                ConvertNodeChoicesToDialogueChoices(node.Transitions),
+                node.TransitionType,
                 node.IsStartingNode()
             );
 
@@ -196,11 +196,11 @@ namespace Game.NovelVisualization.Editor
             SaveAsset(dialogue);
         }
 
-        private static List<DSDialogueChoiceData> ConvertNodeChoicesToDialogueChoices(List<DSChoiceSaveData> nodeChoices)
+        private static List<DSDialogueChoiceData> ConvertNodeChoicesToDialogueChoices(List<TransitionSaveData> nodeChoices)
         {
             List<DSDialogueChoiceData> dialogueChoices = new List<DSDialogueChoiceData>();
 
-            foreach (DSChoiceSaveData nodeChoice in nodeChoices)
+            foreach (TransitionSaveData nodeChoice in nodeChoices)
             {
                 DSDialogueChoiceData choiceData = new DSDialogueChoiceData()
                 {
@@ -215,13 +215,13 @@ namespace Game.NovelVisualization.Editor
 
         private static void UpdateDialoguesChoicesConnections()
         {
-            foreach (DSNode node in nodes)
+            foreach (CustomNode node in nodes)
             {
                 DSDialogueSO dialogue = createdDialogues[node.ID];
 
-                for (int choiceIndex = 0; choiceIndex < node.Choices.Count; ++choiceIndex)
+                for (int choiceIndex = 0; choiceIndex < node.Transitions.Count; ++choiceIndex)
                 {
-                    DSChoiceSaveData nodeChoice = node.Choices[choiceIndex];
+                    TransitionSaveData nodeChoice = node.Transitions[choiceIndex];
 
                     if (string.IsNullOrEmpty(nodeChoice.NodeID))
                     {
@@ -301,7 +301,7 @@ namespace Game.NovelVisualization.Editor
         {
             foreach (DSGroupSaveData groupData in groups)
             {
-                DSGroup group = graphView.CreateGroup(groupData.Name, groupData.Position);
+                CustomGroup group = graphView.CreateGroup(groupData.Name, groupData.Position);
 
                 group.ID = groupData.ID;
 
@@ -313,13 +313,13 @@ namespace Game.NovelVisualization.Editor
         {
             foreach (DSNodeSaveData nodeData in nodes)
             {
-                List<DSChoiceSaveData> choices = CloneNodeChoices(nodeData.Choices);
+                List<TransitionSaveData> choices = CloneNodeChoices(nodeData.Choices);
 
-                DSNode node = graphView.CreateNode(nodeData.Name, nodeData.DialogueType, nodeData.Position, false);
+                CustomNode node = graphView.CreateNode(nodeData.Name, nodeData.DialogueType, nodeData.Position, false);
 
                 node.ID = nodeData.ID;
-                node.Choices = choices;
-                node.Text = nodeData.Text;
+                node.Transitions = choices;
+                node.MetaData = nodeData.Text;
 
                 node.Draw();
 
@@ -332,7 +332,7 @@ namespace Game.NovelVisualization.Editor
                     continue;
                 }
 
-                DSGroup group = loadedGroups[nodeData.GroupID];
+                CustomGroup group = loadedGroups[nodeData.GroupID];
 
                 node.Group = group;
 
@@ -342,18 +342,18 @@ namespace Game.NovelVisualization.Editor
 
         private static void LoadNodesConnections()
         {
-            foreach (KeyValuePair<string, DSNode> loadedNode in loadedNodes)
+            foreach (KeyValuePair<string, CustomNode> loadedNode in loadedNodes)
             {
                 foreach (Port choicePort in loadedNode.Value.outputContainer.Children())
                 {
-                    DSChoiceSaveData choiceData = (DSChoiceSaveData) choicePort.userData;
+                    TransitionSaveData choiceData = (TransitionSaveData) choicePort.userData;
 
                     if (string.IsNullOrEmpty(choiceData.NodeID))
                     {
                         continue;
                     }
 
-                    DSNode nextNode = loadedNodes[choiceData.NodeID];
+                    CustomNode nextNode = loadedNodes[choiceData.NodeID];
 
                     Port nextNodeInputPort = (Port) nextNode.inputContainer.Children().First();
 
@@ -381,11 +381,11 @@ namespace Game.NovelVisualization.Editor
 
         private static void GetElementsFromGraphView()
         {
-            Type groupType = typeof(DSGroup);
+            Type groupType = typeof(CustomGroup);
 
             graphView.graphElements.ForEach(graphElement =>
             {
-                if (graphElement is DSNode node)
+                if (graphElement is CustomNode node)
                 {
                     nodes.Add(node);
 
@@ -394,7 +394,7 @@ namespace Game.NovelVisualization.Editor
 
                 if (graphElement.GetType() == groupType)
                 {
-                    DSGroup group = (DSGroup) graphElement;
+                    CustomGroup group = (CustomGroup) graphElement;
 
                     groups.Add(group);
 
@@ -455,13 +455,13 @@ namespace Game.NovelVisualization.Editor
             AssetDatabase.DeleteAsset($"{path}/{assetName}.asset");
         }
 
-        private static List<DSChoiceSaveData> CloneNodeChoices(List<DSChoiceSaveData> nodeChoices)
+        private static List<TransitionSaveData> CloneNodeChoices(List<TransitionSaveData> nodeChoices)
         {
-            List<DSChoiceSaveData> choices = new List<DSChoiceSaveData>();
+            List<TransitionSaveData> choices = new List<TransitionSaveData>();
 
-            foreach (DSChoiceSaveData choice in nodeChoices)
+            foreach (TransitionSaveData choice in nodeChoices)
             {
-                DSChoiceSaveData choiceData = new DSChoiceSaveData()
+                TransitionSaveData choiceData = new TransitionSaveData()
                 {
                     Text = choice.Text,
                     NodeID = choice.NodeID

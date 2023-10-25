@@ -3,7 +3,7 @@ using UnityEditor;
 
 namespace Game.NovelVisualization.Editor
 {
-    public static class DSInspectorUtility
+    public static class GraphInspectorUtility
     {
         public static void DrawDisabledFields(Action action)
         {

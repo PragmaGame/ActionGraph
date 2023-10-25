@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 
 namespace Game.NovelVisualization.Editor
 {
-    public static class DSElementUtility
+    public static class GraphElementUtility
     {
         public static Button CreateButton(string text, Action onClick = null)
         {
@@ -27,7 +27,7 @@ namespace Game.NovelVisualization.Editor
             return foldout;
         }
 
-        public static Port CreatePort(this DSNode node, string portName = "", Orientation orientation = Orientation.Horizontal, Direction direction = Direction.Output, Port.Capacity capacity = Port.Capacity.Single)
+        public static Port CreatePort(this CustomNode node, string portName = "", Orientation orientation = Orientation.Horizontal, Direction direction = Direction.Output, Port.Capacity capacity = Port.Capacity.Single)
         {
             Port port = node.InstantiatePort(orientation, direction, capacity, typeof(bool));
 

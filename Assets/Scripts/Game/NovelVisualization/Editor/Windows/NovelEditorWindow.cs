@@ -6,20 +6,20 @@ using UnityEngine.UIElements;
 
 namespace Game.NovelVisualization.Editor
 {
-    public class DSEditorWindow : EditorWindow
+    public class NovelEditorWindow : EditorWindow
     {
-        private DSGraphView graphView;
+        private NovelGraphView graphView;
 
-        private readonly string defaultFileName = "DialoguesFileName";
+        private readonly string defaultFileName = "NovelGraphFileName";
 
         private static TextField fileNameTextField;
         private Button saveButton;
         private Button miniMapButton;
 
-        [MenuItem("Window/DS/Dialogue Graph")]
+        [MenuItem("Novel/Novel Graph")]
         public static void Open()
         {
-            GetWindow<DSEditorWindow>("Dialogue Graph");
+            GetWindow<NovelEditorWindow>("Novel Graph");
         }
 
         private void OnEnable()
@@ -32,7 +32,7 @@ namespace Game.NovelVisualization.Editor
 
         private void AddGraphView()
         {
-            graphView = new DSGraphView(this);
+            graphView = new NovelGraphView(this);
 
             graphView.StretchToParentSize();
 
@@ -43,18 +43,18 @@ namespace Game.NovelVisualization.Editor
         {
             Toolbar toolbar = new Toolbar();
 
-            fileNameTextField = DSElementUtility.CreateTextField(defaultFileName, "File Name:", callback =>
+            fileNameTextField = GraphElementUtility.CreateTextField(defaultFileName, "File Name:", callback =>
             {
                 fileNameTextField.value = callback.newValue.RemoveWhitespaces().RemoveSpecialCharacters();
             });
 
-            saveButton = DSElementUtility.CreateButton("Save", () => Save());
+            saveButton = GraphElementUtility.CreateButton("Save", () => Save());
 
-            Button loadButton = DSElementUtility.CreateButton("Load", () => Load());
-            Button clearButton = DSElementUtility.CreateButton("Clear", () => Clear());
-            Button resetButton = DSElementUtility.CreateButton("Reset", () => ResetGraph());
+            Button loadButton = GraphElementUtility.CreateButton("Load", () => Load());
+            Button clearButton = GraphElementUtility.CreateButton("Clear", () => Clear());
+            Button resetButton = GraphElementUtility.CreateButton("Reset", () => ResetGraph());
 
-            miniMapButton = DSElementUtility.CreateButton("Minimap", () => ToggleMiniMap());
+            miniMapButton = GraphElementUtility.CreateButton("Minimap", () => ToggleMiniMap());
 
             toolbar.Add(fileNameTextField);
             toolbar.Add(saveButton);
@@ -82,8 +82,8 @@ namespace Game.NovelVisualization.Editor
                 return;
             }
 
-            DSIOUtility.Initialize(graphView, fileNameTextField.value);
-            DSIOUtility.Save();
+            GraphIOUtility.Initialize(graphView, fileNameTextField.value);
+            GraphIOUtility.Save();
         }
 
         private void Load()
@@ -97,8 +97,8 @@ namespace Game.NovelVisualization.Editor
 
             Clear();
 
-            DSIOUtility.Initialize(graphView, Path.GetFileNameWithoutExtension(filePath));
-            DSIOUtility.Load();
+            GraphIOUtility.Initialize(graphView, Path.GetFileNameWithoutExtension(filePath));
+            GraphIOUtility.Load();
         }
 
         private void Clear()

@@ -1,18 +1,16 @@
 using System.Collections.Generic;
 
-namespace DS.Data.Error
+namespace Game.NovelVisualization.Editor
 {
-    using Elements;
-
     public class DSNodeErrorData
     {
         public DSErrorData ErrorData { get; set; }
-        public List<DSNode> Nodes { get; set; }
+        public List<CustomNode> Nodes { get; set; }
 
         public DSNodeErrorData()
         {
             ErrorData = new DSErrorData();
-            Nodes = new List<DSNode>();
+            Nodes = new List<CustomNode>();
         }
     }
 }
