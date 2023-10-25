@@ -1,13 +1,11 @@
 using System.IO;
+using Game.NovelVisualization.Runtime;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
-namespace DS.Windows
+namespace Game.NovelVisualization.Editor
 {
-    using System;
-    using Utilities;
-
     public class DSEditorWindow : EditorWindow
     {
         private DSGraphView graphView;

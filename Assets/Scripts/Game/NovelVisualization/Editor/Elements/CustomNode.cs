@@ -1,17 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Game.NovelVisualization.Runtime;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace DS.Elements
+namespace Game.NovelVisualization.Editor
 {
-    using Data.Save;
-    using Enumerations;
-    using Utilities;
-    using Windows;
-
     public class DSNode : Node
     {
         public string ID { get; set; }
@@ -21,7 +17,7 @@ namespace DS.Elements
         public DSDialogueType DialogueType { get; set; }
         public DSGroup Group { get; set; }
 
-        protected DSGraphView graphView;
+        protected NovelGraphView graphView;
         private Color defaultBackgroundColor;
 
         public override void BuildContextualMenu(ContextualMenuPopulateEvent evt)
@@ -32,7 +28,7 @@ namespace DS.Elements
             base.BuildContextualMenu(evt);
         }
 
-        public virtual void Initialize(string nodeName, DSGraphView dsGraphView, Vector2 position)
+        public virtual void Initialize(string nodeName, NovelGraphView novelGraphView, Vector2 position)
         {
             ID = Guid.NewGuid().ToString();
 
@@ -42,7 +38,7 @@ namespace DS.Elements
 
             SetPosition(new Rect(position, Vector2.zero));
 
-            graphView = dsGraphView;
+            graphView = novelGraphView;
             defaultBackgroundColor = new Color(29f / 255f, 29f / 255f, 30f / 255f);
 
             mainContainer.AddToClassList("ds-node__main-container");
@@ -53,7 +49,7 @@ namespace DS.Elements
         {
             /* TITLE CONTAINER */
 
-            TextField dialogueNameTextField = DSElementUtility.CreateTextField(DialogueName, null, callback =>
+            TextField dialogueNameTextField = GraphElementUtility.CreateTextField(DialogueName, null, callback =>
             {
                 TextField target = (TextField) callback.target;
 
@@ -114,9 +110,9 @@ namespace DS.Elements
 
             customDataContainer.AddToClassList("ds-node__custom-data-container");
 
-            Foldout textFoldout = DSElementUtility.CreateFoldout("Dialogue Text");
+            Foldout textFoldout = GraphElementUtility.CreateFoldout("Dialogue Text");
 
-            TextField textTextField = DSElementUtility.CreateTextArea(Text, null, callback => Text = callback.newValue);
+            TextField textTextField = GraphElementUtility.CreateTextArea(Text, null, callback => Text = callback.newValue);
 
             textTextField.AddClasses(
                 "ds-node__text-field",

@@ -1,21 +1,17 @@
+using Game.NovelVisualization.Runtime;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace DS.Elements
+namespace Game.NovelVisualization.Editor
 {
-    using Data.Save;
-    using Enumerations;
-    using Utilities;
-    using Windows;
-
-    public class DSMultipleChoiceNode : DSNode
+    public class CustomMultipleChoiceNode : CustomNode
     {
-        public override void Initialize(string nodeName, DSGraphView dsGraphView, Vector2 position)
+        public override void Initialize(string nodeName, NovelGraphView novelGraphView, Vector2 position)
         {
-            base.Initialize(nodeName, dsGraphView, position);
+            base.Initialize(nodeName, novelGraphView, position);
 
-            DialogueType = DSDialogueType.MultipleChoice;
+            DialogueType = TransitionType.Multiple;
 
             DSChoiceSaveData choiceData = new DSChoiceSaveData()
             {
@@ -31,7 +27,7 @@ namespace DS.Elements
 
             /* MAIN CONTAINER */
 
-            Button addChoiceButton = DSElementUtility.CreateButton("Add Choice", () =>
+            Button addChoiceButton = GraphElementUtility.CreateButton("Add Choice", () =>
             {
                 DSChoiceSaveData choiceData = new DSChoiceSaveData()
                 {
@@ -69,7 +65,7 @@ namespace DS.Elements
 
             DSChoiceSaveData choiceData = (DSChoiceSaveData) userData;
 
-            Button deleteChoiceButton = DSElementUtility.CreateButton("X", () =>
+            Button deleteChoiceButton = GraphElementUtility.CreateButton("X", () =>
             {
                 if (Choices.Count == 1)
                 {
@@ -88,7 +84,7 @@ namespace DS.Elements
 
             deleteChoiceButton.AddToClassList("ds-node__button");
 
-            TextField choiceTextField = DSElementUtility.CreateTextField(choiceData.Text, null, callback =>
+            TextField choiceTextField = GraphElementUtility.CreateTextField(choiceData.Text, null, callback =>
             {
                 choiceData.Text = callback.newValue;
             });

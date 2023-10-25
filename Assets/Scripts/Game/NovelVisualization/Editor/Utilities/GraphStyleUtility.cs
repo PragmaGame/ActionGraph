@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine.UIElements;
 
-namespace DS.Utilities
+namespace Game.NovelVisualization.Editor
 {
     public static class DSStyleUtility
     {

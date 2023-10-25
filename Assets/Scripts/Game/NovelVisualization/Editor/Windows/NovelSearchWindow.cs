@@ -1,20 +1,18 @@
 using System.Collections.Generic;
+using Game.NovelVisualization.Runtime;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-namespace DS.Windows
+namespace Game.NovelVisualization.Editor
 {
-    using Elements;
-    using Enumerations;
-
     public class DSSearchWindow : ScriptableObject, ISearchWindowProvider
     {
-        private DSGraphView graphView;
+        private NovelGraphView graphView;
         private Texture2D indentationIcon;
 
-        public void Initialize(DSGraphView dsGraphView)
+        public void Initialize(NovelGraphView novelGraphView)
         {
-            graphView = dsGraphView;
+            graphView = novelGraphView;
 
             indentationIcon = new Texture2D(1, 1);
             indentationIcon.SetPixel(0, 0, Color.clear);

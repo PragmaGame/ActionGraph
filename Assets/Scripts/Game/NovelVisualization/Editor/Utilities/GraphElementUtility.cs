@@ -2,10 +2,8 @@ using System;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 
-namespace DS.Utilities
+namespace Game.NovelVisualization.Editor
 {
-    using Elements;
-
     public static class DSElementUtility
     {
         public static Button CreateButton(string text, Action onClick = null)

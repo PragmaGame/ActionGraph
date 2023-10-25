@@ -1,20 +1,15 @@
 using System;
 using System.Collections.Generic;
+using Game.NovelVisualization.Runtime;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace DS.Windows
+namespace Game.NovelVisualization.Editor
 {
-    using Data.Error;
-    using Data.Save;
-    using Elements;
-    using Enumerations;
-    using Utilities;
-
     public class DSGraphView : GraphView
     {
-        private DSEditorWindow editorWindow;
+        private NovelEditorWindow editorWindow;
         private DSSearchWindow searchWindow;
 
         private MiniMap miniMap;
@@ -48,9 +43,9 @@ namespace DS.Windows
             }
         }
 
-        public DSGraphView(DSEditorWindow dsEditorWindow)
+        public DSGraphView(NovelEditorWindow novelEditorWindow)
         {
-            editorWindow = dsEditorWindow;
+            editorWindow = novelEditorWindow;
 
             ungroupedNodes = new SerializableDictionary<string, DSNodeErrorData>();
             groups = new SerializableDictionary<string, DSGroupErrorData>();

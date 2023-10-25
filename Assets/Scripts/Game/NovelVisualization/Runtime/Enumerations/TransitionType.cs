@@ -1,4 +1,4 @@
-namespace DS.Enumerations
+namespace Game.NovelVisualization.Runtime
 {
     public enum DSDialogueType
     {

@@ -1,7 +1,7 @@
 using System;
 using UnityEditor;
 
-namespace DS.Utilities
+namespace Game.NovelVisualization.Editor
 {
     public static class DSInspectorUtility
     {

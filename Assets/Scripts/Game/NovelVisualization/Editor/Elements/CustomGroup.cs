@@ -2,7 +2,7 @@ using System;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-namespace DS.Elements
+namespace Game.NovelVisualization.Editor
 {
     public class DSGroup : Group
     {

@@ -1,20 +1,16 @@
+using Game.NovelVisualization.Runtime;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-namespace DS.Elements
+namespace Game.NovelVisualization.Editor
 {
-    using Data.Save;
-    using Enumerations;
-    using Utilities;
-    using Windows;
-
-    public class DSSingleChoiceNode : DSNode
+    public class CustomSingleChoiceNode : CustomNode
     {
-        public override void Initialize(string nodeName, DSGraphView dsGraphView, Vector2 position)
+        public override void Initialize(string nodeName, NovelGraphView novelGraphView, Vector2 position)
         {
-            base.Initialize(nodeName, dsGraphView, position);
+            base.Initialize(nodeName, novelGraphView, position);
 
-            DialogueType = DSDialogueType.SingleChoice;
+            DialogueType = TransitionType.Single;
 
             DSChoiceSaveData choiceData = new DSChoiceSaveData()
             {

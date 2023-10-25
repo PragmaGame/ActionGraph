@@ -1,21 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Game.NovelVisualization.Runtime;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-namespace DS.Utilities
+namespace Game.NovelVisualization.Editor
 {
-    using Data;
-    using Data.Save;
-    using Elements;
-    using ScriptableObjects;
-    using Windows;
-
     public static class DSIOUtility
     {
-        private static DSGraphView graphView;
+        private static NovelGraphView graphView;
 
         private static string graphFileName;
         private static string containerFolderPath;
@@ -29,9 +24,9 @@ namespace DS.Utilities
         private static Dictionary<string, DSGroup> loadedGroups;
         private static Dictionary<string, DSNode> loadedNodes;
 
-        public static void Initialize(DSGraphView dsGraphView, string graphName)
+        public static void Initialize(NovelGraphView novelGraphView, string graphName)
         {
-            graphView = dsGraphView;
+            graphView = novelGraphView;
 
             graphFileName = graphName;
             containerFolderPath = $"Assets/DialogueSystem/Dialogues/{graphName}";
@@ -295,7 +290,7 @@ namespace DS.Utilities
                 return;
             }
 
-            DSEditorWindow.UpdateFileName(graphData.FileName);
+            NovelEditorWindow.UpdateFileName(graphData.FileName);
 
             LoadGroups(graphData.Groups);
             LoadNodes(graphData.Nodes);
