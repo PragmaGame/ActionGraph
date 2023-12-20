@@ -3,9 +3,11 @@ using UnityEngine;
 
 namespace Game.Graph
 {
-    public class ActionGraph : MonoBehaviour
+    public class GameGraph : MonoBehaviour
     {
-        public event Action<string, string> SwitchNodeGraphEvent;
+        [SerializeField] private NodeMetaDataParser _parser;
+        
+        public event Action<string> ChangeNodeGraphEvent;
 
         public void SwitchToNode(string nodeId)
         {

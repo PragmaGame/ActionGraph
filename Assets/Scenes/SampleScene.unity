@@ -351,9 +351,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1117505633}
+  - component: {fileID: 1117505635}
   - component: {fileID: 1117505634}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: GameGraph
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -383,22 +384,46 @@ MonoBehaviour:
   m_GameObject: {fileID: 1117505632}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 903094870517463a9da7d43d9fbb6970, type: 3}
+  m_Script: {fileID: 11500000, guid: 521142dee5d245ea94a344b61b2e0d15, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  serializationData:
-    SerializedFormat: 2
-    SerializedBytes: 
-    ReferencedUnityObjects: []
-    SerializedBytesString: 
-    Prefab: {fileID: 0}
-    PrefabModificationsReferencedUnityObjects: []
-    PrefabModifications: []
-    SerializationNodes:
-    - Name: _items
-      Entry: 6
-      Data: 
-  a: 
+  _actionHubs:
+  - _id: 
+    _processorHubs:
+    - _processRunner:
+        rid: 1689203271632945155
+      _processors:
+      - rid: 1689203271632945153
+      - rid: 1689203271632945154
+  references:
+    version: 2
+    RefIds:
+    - rid: 1689203271632945153
+      type: {class: TextProcessor, ns: Game.Hub.Processors, asm: Assembly-CSharp}
+      data:
+        text: 1
+        _delayer: 2
+    - rid: 1689203271632945154
+      type: {class: TextProcessor, ns: Game.Hub.Processors, asm: Assembly-CSharp}
+      data:
+        text: 2
+        _delayer: 4
+    - rid: 1689203271632945155
+      type: {class: SequenceProcessRunner, ns: Game.Hub.ProcessRunners, asm: Assembly-CSharp}
+      data: 
+--- !u!114 &1117505635
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1117505632}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a52f2d216f7d4f34a4d32480b523fc73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _parser: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

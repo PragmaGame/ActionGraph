@@ -1,6 +1,6 @@
 ﻿namespace Game.Services
 {
-    public class ServiceLocator
+    public interface IService
     {
         
     }
