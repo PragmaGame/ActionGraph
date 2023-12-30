@@ -5,6 +5,7 @@ using Cysharp.Threading.Tasks;
 using Game.Core.Hub.ProcessRunners;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using Zenject;
 
 namespace Game.Core.Hub
 {
@@ -19,13 +20,14 @@ namespace Game.Core.Hub
         
         public string Id => _id;
 
-        public void Construct()
+        [Inject]
+        private void Construct(DiContainer container)
         {
             _runner = new SequenceProcessRunner();
-            
+
             foreach (var processorHub in _processorHubs)
             {
-                processorHub.Construct();
+                container.Inject(processorHub);
             }
         }
 

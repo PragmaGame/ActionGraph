@@ -1,4 +1,5 @@
-﻿using Sirenix.OdinInspector;
+﻿using Cysharp.Threading.Tasks;
+using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 
@@ -22,7 +23,7 @@ namespace Game.Core.Dialogue
         }
         
         [Button(ButtonStyle.FoldoutButton)]
-        public void ShowText(string speakerName, string text)
+        public UniTask ShowText(string speakerName, string text)
         {
             if (string.IsNullOrEmpty(speakerName))
             {
@@ -35,6 +36,8 @@ namespace Game.Core.Dialogue
             }
             
             _mainText.text = text;
+
+            return UniTask.CompletedTask;
         }
     }
 }

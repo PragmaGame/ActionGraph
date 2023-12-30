@@ -1,17 +1,19 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
 namespace Game.Core.Hub
 {
     public class GraphActionHub : MonoBehaviour
     {
-        [SerializeField] private List<GraphAction> _actionHubs;
+        [SerializeField] private List<GraphAction> _graphActions;
 
-        private void Awake()
+        [Inject]
+        private void Construct(DiContainer container)
         {
-            foreach (var actionHub in _actionHubs)
+            foreach (var graphAction in _graphActions)
             {
-                actionHub.Construct();
+                container.Inject(graphAction);
             }
         }
     }

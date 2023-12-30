@@ -5,7 +5,6 @@ namespace Game.Core.Hub.Processors
 {
     public interface IActionProcessor
     {
-        public void Construct();
-        public UniTask RunProcess(CancellationToken token);
+        public UniTask RunProcess(CancellationToken token = default);
     }
 }

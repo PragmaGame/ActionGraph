@@ -5,6 +5,7 @@ using Cysharp.Threading.Tasks;
 using Game.Core.Hub.Processors;
 using Game.Core.Hub.ProcessRunners;
 using UnityEngine;
+using Zenject;
 
 namespace Game.Core.Hub
 {
@@ -12,13 +13,14 @@ namespace Game.Core.Hub
     public class ProcessorHub
     {
         [SerializeReference] private IProcessRunner _processRunner;
-        [SerializeReference] private List<IActionProcessor> _processors;
+        [SerializeReference] private List<IActionProcessor> _processors = new();
 
-        public void Construct()
+        [Inject]
+        private void Construct(DiContainer container)
         {
             foreach (var processor in _processors)
             {
-                processor.Construct();
+                container.Inject(processor);
             }
         }
 
