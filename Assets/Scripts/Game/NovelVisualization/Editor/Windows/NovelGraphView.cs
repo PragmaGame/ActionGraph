@@ -1,6 +1,6 @@
-using System;
-using System.Collections.Generic;
-using Game.NovelVisualization.Runtime;
+﻿using System.Collections.Generic;
+using System.Linq;
+using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -9,623 +9,261 @@ namespace Game.NovelVisualization.Editor
 {
     public class NovelGraphView : GraphView
     {
-        private NovelEditorWindow editorWindow;
-        private NovelSearchWindow searchWindow;
+        private NovelGraphViewConfig _config;
 
-        private MiniMap miniMap;
+        private Dictionary<string, List<GraphNode>> _uniqueNodesKeys;
 
-        private SerializableDictionary<string, DSNodeErrorData> ungroupedNodes;
-        private SerializableDictionary<string, DSGroupErrorData> groups;
-        private SerializableDictionary<Group, SerializableDictionary<string, DSNodeErrorData>> groupedNodes;
-
-        private int nameErrorsAmount;
-
-        public int NameErrorsAmount
+        public NovelGraphView()
         {
-            get
-            {
-                return nameErrorsAmount;
-            }
-
-            set
-            {
-                nameErrorsAmount = value;
-
-                if (nameErrorsAmount == 0)
-                {
-                    editorWindow.EnableSaving();
-                }
-
-                if (nameErrorsAmount == 1)
-                {
-                    editorWindow.DisableSaving();
-                }
-            }
-        }
-
-        public NovelGraphView(NovelEditorWindow novelEditorWindow)
-        {
-            editorWindow = novelEditorWindow;
-
-            ungroupedNodes = new SerializableDictionary<string, DSNodeErrorData>();
-            groups = new SerializableDictionary<string, DSGroupErrorData>();
-            groupedNodes = new SerializableDictionary<Group, SerializableDictionary<string, DSNodeErrorData>>();
-
             AddManipulators();
             AddGridBackground();
-            AddSearchWindow();
-            AddMiniMap();
-
-            OnElementsDeleted();
-            OnGroupElementsAdded();
-            OnGroupElementsRemoved();
-            OnGroupRenamed();
-            OnGraphViewChanged();
-
             AddStyles();
-            AddMiniMapStyles();
+
+            SetElementsDeletedCallback();
+            SetGraphViewChangedCallback();
+            
+            _config = (NovelGraphViewConfig)EditorGUIUtility.Load("NovelGraph/NovelGraphViewConfig.asset");
+
+            _uniqueNodesKeys = new Dictionary<string, List<GraphNode>>();
         }
-
-        public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)
-        {
-            List<Port> compatiblePorts = new List<Port>();
-
-            ports.ForEach(port =>
-            {
-                if (startPort == port)
-                {
-                    return;
-                }
-
-                if (startPort.node == port.node)
-                {
-                    return;
-                }
-
-                if (startPort.direction == port.direction)
-                {
-                    return;
-                }
-
-                compatiblePorts.Add(port);
-            });
-
-            return compatiblePorts;
-        }
-
+        
         private void AddManipulators()
         {
-            SetupZoom(ContentZoomer.DefaultMinScale, ContentZoomer.DefaultMaxScale);
-
             this.AddManipulator(new ContentDragger());
+            this.AddManipulator(new ContentZoomer());
             this.AddManipulator(new SelectionDragger());
             this.AddManipulator(new RectangleSelector());
-
-            this.AddManipulator(CreateNodeContextualMenu("Add Node (Single Transition)", TransitionType.Single));
-            this.AddManipulator(CreateNodeContextualMenu("Add Node (Multiple Transition)", TransitionType.Multiple));
-
-            this.AddManipulator(CreateGroupContextualMenu());
+            
+            this.AddManipulator(CreateNodeContextMenu());
+            this.AddManipulator(CreateGroupContextMenu());
         }
-
-        private IManipulator CreateNodeContextualMenu(string actionTitle, TransitionType dialogueType)
+        
+        private IManipulator CreateNodeContextMenu()
         {
-            ContextualMenuManipulator contextualMenuManipulator = new ContextualMenuManipulator(
-                menuEvent => menuEvent.menu.AppendAction(actionTitle, actionEvent => AddElement(CreateNode("Key", dialogueType, GetLocalMousePosition(actionEvent.eventInfo.localMousePosition))))
+            var contextualMenuManipulator = new ContextualMenuManipulator(
+                menuEvent => menuEvent.menu.InsertAction(0,"Create Node", 
+                    action => AddElement(CreateNode(GetGraphMousePosition(action.eventInfo.localMousePosition))))
+            );
+
+            return contextualMenuManipulator;
+        }
+        
+        private IManipulator CreateGroupContextMenu()
+        {
+            var contextualMenuManipulator = new ContextualMenuManipulator(
+                menuEvent => menuEvent.menu.InsertAction(1,"Create Group", 
+                    action => CreateGroup(GetGraphMousePosition(action.eventInfo.localMousePosition)))
             );
 
             return contextualMenuManipulator;
         }
 
-        private IManipulator CreateGroupContextualMenu()
+        private Group CreateGroup(Vector2 position)
         {
-            ContextualMenuManipulator contextualMenuManipulator = new ContextualMenuManipulator(
-                menuEvent => menuEvent.menu.AppendAction("Add Group", actionEvent => CreateGroup("Group Key", GetLocalMousePosition(actionEvent.eventInfo.localMousePosition)))
-            );
-
-            return contextualMenuManipulator;
-        }
-
-        public CustomGroup CreateGroup(string title, Vector2 position)
-        {
-            CustomGroup group = new CustomGroup(title, position);
-
-            AddGroup(group);
+            var group = new Group()
+            {
+                title = "DefaultGroupName"
+            };
 
             AddElement(group);
+            
+            group.SetPosition(new Rect(position, Vector2.one));
 
-            foreach (GraphElement selectedElement in selection)
+            foreach(var selected in selection)
             {
-                if (!(selectedElement is CustomNode))
+                if (selected is GraphNode graphNode)
                 {
-                    continue;
+                    group.AddElement(graphNode);
                 }
-
-                CustomNode node = (CustomNode) selectedElement;
-
-                group.AddElement(node);
             }
 
             return group;
         }
-
-        public CustomNode CreateNode(string nodeName, TransitionType dialogueType, Vector2 position, bool shouldDraw = true)
+        
+        private GraphNode CreateNode(Vector2 position)
         {
-            var nodeType = dialogueType switch
-            {
-                TransitionType.Single => typeof(SingleNode),
-                TransitionType.Multiple => typeof(MultipleNode),
-                _ => throw new ArgumentOutOfRangeException(nameof(dialogueType), dialogueType, null)
-            };
+            var node = new GraphNode();
+            
+            node.Initialize(position);
+            node.Draw();
 
-            var node = (CustomNode)Activator.CreateInstance(nodeType);
-
-            node.Initialize(nodeName, this, position);
-
-            if (shouldDraw)
-            {
-                node.Draw();
-            }
-
-            AddUngroupedNode(node);
+            RegisterNode(node);
 
             return node;
         }
 
-        private void OnElementsDeleted()
+        public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)
         {
-            deleteSelection = (operationName, askUser) =>
+            var compatiblePorts = new List<Port>();
+
+            foreach (var port in ports)
             {
-                Type groupType = typeof(CustomGroup);
-                Type edgeType = typeof(Edge);
-
-                List<CustomGroup> groupsToDelete = new List<CustomGroup>();
-                List<CustomNode> nodesToDelete = new List<CustomNode>();
-                List<Edge> edgesToDelete = new List<Edge>();
-
-                foreach (GraphElement selectedElement in selection)
+                if (startPort.node == port.node)
                 {
-                    if (selectedElement is CustomNode node)
-                    {
-                        nodesToDelete.Add(node);
-
-                        continue;
-                    }
-
-                    if (selectedElement.GetType() == edgeType)
-                    {
-                        Edge edge = (Edge) selectedElement;
-
-                        edgesToDelete.Add(edge);
-
-                        continue;
-                    }
-
-                    if (selectedElement.GetType() != groupType)
-                    {
-                        continue;
-                    }
-
-                    CustomGroup group = (CustomGroup) selectedElement;
-
-                    groupsToDelete.Add(group);
+                    continue;
                 }
-
-                foreach (CustomGroup groupToDelete in groupsToDelete)
+                
+                if (startPort.direction == port.direction)
                 {
-                    List<CustomNode> groupNodes = new List<CustomNode>();
+                    continue;
+                }
+                
+                compatiblePorts.Add(port);
+            }
+        
+            return compatiblePorts;
+        }
 
-                    foreach (GraphElement groupElement in groupToDelete.containedElements)
+        private void AddStyles()
+        {
+            var graphViewStyleSheet = (StyleSheet)EditorGUIUtility.Load("NovelGraph/NovelGraphViewStyles.uss");
+            var nodeStyleSheet = (StyleSheet)EditorGUIUtility.Load("NovelGraph/NovelNodeStyles.uss");
+            
+            styleSheets.Add(graphViewStyleSheet);
+            styleSheets.Add(nodeStyleSheet);
+        }
+
+        private void AddGridBackground()
+        {
+            var gridBackground = new GridBackground();
+            
+            gridBackground.StretchToParentSize();
+            
+            Insert(0, gridBackground);
+        }
+
+        private void RegisterNode(GraphNode node)
+        {
+            node.ChangeKeyEvent += OnRevalidateKey;
+            node.DeleteElementsRequestEvent += OnDeleteElements;
+            
+            ValidateKey(node);
+        }
+
+        private void OnDeleteElements(List<GraphElement> elements)
+        {
+            DeleteElements(elements);
+        }
+
+        private void ValidateKey(GraphNode node)
+        {
+            var key = node.Key;
+            
+            if (_uniqueNodesKeys.ContainsKey(key))
+            {
+                if (_uniqueNodesKeys[key].Count == 1)
+                {
+                    _uniqueNodesKeys[key][0].SetBackgroundColor(_config.ErrorColor);
+                }
+                
+                _uniqueNodesKeys[key].Add(node);
+                
+                node.SetBackgroundColor(_config.ErrorColor);
+            }
+            else
+            {
+                _uniqueNodesKeys.Add(node.Key, new List<GraphNode>() {node});
+            }
+        }
+
+        private void RemoveKey(GraphNode node, string key = null)
+        {
+            key ??= node.Key;
+            
+            _uniqueNodesKeys[key].Remove(node);
+            
+            node.SetBackgroundColor(_config.DefaultColor);
+
+            switch (_uniqueNodesKeys[key].Count)
+            {
+                case 1:
+                {
+                    _uniqueNodesKeys[key][0].SetBackgroundColor(_config.DefaultColor);
+                    break;
+                }
+                case 0:
+                {
+                    _uniqueNodesKeys.Remove(key);
+                    break;
+                }
+            }
+        }
+
+        private void OnRevalidateKey(GraphNode node, string oldKey)
+        {
+            RemoveKey(node, oldKey);
+            
+            ValidateKey(node);
+        }
+        
+        private void SetElementsDeletedCallback()
+        {
+            deleteSelection = (_, _) =>
+            {
+                var connections = new HashSet<Edge>();
+                
+                foreach (var selectable in selection)
+                {
+                    if (selectable is not GraphNode graphNode)
                     {
-                        if (!(groupElement is CustomNode))
+                        continue;
+                    }
+                    
+                    graphNode.ChangeKeyEvent -= OnRevalidateKey;
+                    graphNode.DeleteElementsRequestEvent -= OnDeleteElements;
+                    RemoveKey(graphNode);
+                    
+                    graphNode.Query<Port>().ForEach(port =>
+                    {
+                        if (!port.connected)
                         {
-                            continue;
+                            return;
                         }
 
-                        CustomNode groupNode = (CustomNode) groupElement;
-
-                        groupNodes.Add(groupNode);
-                    }
-
-                    groupToDelete.RemoveElements(groupNodes);
-
-                    RemoveGroup(groupToDelete);
-
-                    RemoveElement(groupToDelete);
+                        connections.UnionWith(port.connections);
+                    });
                 }
 
-                DeleteElements(edgesToDelete);
-
-                foreach (CustomNode nodeToDelete in nodesToDelete)
-                {
-                    if (nodeToDelete.Group != null)
-                    {
-                        nodeToDelete.Group.RemoveElement(nodeToDelete);
-                    }
-
-                    RemoveUngroupedNode(nodeToDelete);
-
-                    nodeToDelete.DisconnectAllPorts();
-
-                    RemoveElement(nodeToDelete);
-                }
+                connections.Remove(null);
+                
+                DeleteElements(connections);
+                DeleteElements(selection.OfType<GraphElement>());
             };
         }
 
-        private void OnGroupElementsAdded()
-        {
-            elementsAddedToGroup = (group, elements) =>
-            {
-                foreach (GraphElement element in elements)
-                {
-                    if (!(element is CustomNode))
-                    {
-                        continue;
-                    }
-
-                    CustomGroup customGroup = (CustomGroup) group;
-                    CustomNode node = (CustomNode) element;
-
-                    RemoveUngroupedNode(node);
-                    AddGroupedNode(node, customGroup);
-                }
-            };
-        }
-
-        private void OnGroupElementsRemoved()
-        {
-            elementsRemovedFromGroup = (group, elements) =>
-            {
-                foreach (GraphElement element in elements)
-                {
-                    if (!(element is CustomNode))
-                    {
-                        continue;
-                    }
-
-                    CustomGroup customGroup = (CustomGroup) group;
-                    CustomNode node = (CustomNode) element;
-
-                    RemoveGroupedNode(node, customGroup);
-                    AddUngroupedNode(node);
-                }
-            };
-        }
-
-        private void OnGroupRenamed()
-        {
-            groupTitleChanged = (group, newTitle) =>
-            {
-                CustomGroup customGroup = (CustomGroup) group;
-
-                customGroup.title = newTitle.RemoveWhitespaces().RemoveSpecialCharacters();
-
-                if (string.IsNullOrEmpty(customGroup.title))
-                {
-                    if (!string.IsNullOrEmpty(customGroup.OldTitle))
-                    {
-                        ++NameErrorsAmount;
-                    }
-                }
-                else
-                {
-                    if (string.IsNullOrEmpty(customGroup.OldTitle))
-                    {
-                        --NameErrorsAmount;
-                    }
-                }
-
-                RemoveGroup(customGroup);
-
-                customGroup.OldTitle = customGroup.title;
-
-                AddGroup(customGroup);
-            };
-        }
-
-        private void OnGraphViewChanged()
+        private void SetGraphViewChangedCallback()
         {
             graphViewChanged = (changes) =>
             {
                 if (changes.edgesToCreate != null)
                 {
-                    foreach (Edge edge in changes.edgesToCreate)
+                    foreach (var edge in changes.edgesToCreate)
                     {
-                        CustomNode nextNode = (CustomNode) edge.input.node;
+                        var node = (GraphNode)edge.input.node;
 
-                        TransitionSaveData choiceData = (TransitionSaveData) edge.output.userData;
+                        var transitionData = (TransitionData)edge.output.userData;
 
-                        choiceData.NodeID = nextNode.ID;
+                        transitionData.nodeKey = node.Key;
                     }
                 }
-
+                
                 if (changes.elementsToRemove != null)
                 {
-                    Type edgeType = typeof(Edge);
-
-                    foreach (GraphElement element in changes.elementsToRemove)
+                    foreach (var element in changes.elementsToRemove)
                     {
-                        if (element.GetType() != edgeType)
+                        if (element is Edge edge)
                         {
-                            continue;
+                            var transitionData = (TransitionData)edge.output.userData;
+
+                            transitionData.nodeKey = string.Empty;
                         }
-
-                        Edge edge = (Edge) element;
-
-                        TransitionSaveData choiceData = (TransitionSaveData) edge.output.userData;
-
-                        choiceData.NodeID = "";
                     }
                 }
 
                 return changes;
             };
         }
-
-        public void AddUngroupedNode(CustomNode node)
-        {
-            string nodeName = node.Key.ToLower();
-
-            if (!ungroupedNodes.ContainsKey(nodeName))
-            {
-                DSNodeErrorData nodeErrorData = new DSNodeErrorData();
-
-                nodeErrorData.Nodes.Add(node);
-
-                ungroupedNodes.Add(nodeName, nodeErrorData);
-
-                return;
-            }
-
-            List<CustomNode> ungroupedNodesList = ungroupedNodes[nodeName].Nodes;
-
-            ungroupedNodesList.Add(node);
-
-            Color errorColor = ungroupedNodes[nodeName].ErrorData.Color;
-
-            node.SetErrorStyle(errorColor);
-
-            if (ungroupedNodesList.Count == 2)
-            {
-                ++NameErrorsAmount;
-
-                ungroupedNodesList[0].SetErrorStyle(errorColor);
-            }
-        }
-
-        public void RemoveUngroupedNode(CustomNode node)
-        {
-            string nodeName = node.Key.ToLower();
-
-            List<CustomNode> ungroupedNodesList = ungroupedNodes[nodeName].Nodes;
-
-            ungroupedNodesList.Remove(node);
-
-            node.ResetStyle();
-
-            if (ungroupedNodesList.Count == 1)
-            {
-                --NameErrorsAmount;
-
-                ungroupedNodesList[0].ResetStyle();
-
-                return;
-            }
-
-            if (ungroupedNodesList.Count == 0)
-            {
-                ungroupedNodes.Remove(nodeName);
-            }
-        }
-
-        private void AddGroup(CustomGroup group)
-        {
-            string groupName = group.title.ToLower();
-
-            if (!groups.ContainsKey(groupName))
-            {
-                DSGroupErrorData groupErrorData = new DSGroupErrorData();
-
-                groupErrorData.Groups.Add(group);
-
-                groups.Add(groupName, groupErrorData);
-
-                return;
-            }
-
-            List<CustomGroup> groupsList = groups[groupName].Groups;
-
-            groupsList.Add(group);
-
-            Color errorColor = groups[groupName].ErrorData.Color;
-
-            group.SetErrorStyle(errorColor);
-
-            if (groupsList.Count == 2)
-            {
-                ++NameErrorsAmount;
-
-                groupsList[0].SetErrorStyle(errorColor);
-            }
-        }
-
-        private void RemoveGroup(CustomGroup group)
-        {
-            string oldGroupName = group.OldTitle.ToLower();
-
-            List<CustomGroup> groupsList = groups[oldGroupName].Groups;
-
-            groupsList.Remove(group);
-
-            group.ResetStyle();
-
-            if (groupsList.Count == 1)
-            {
-                --NameErrorsAmount;
-
-                groupsList[0].ResetStyle();
-
-                return;
-            }
-
-            if (groupsList.Count == 0)
-            {
-                groups.Remove(oldGroupName);
-            }
-        }
-
-        public void AddGroupedNode(CustomNode node, CustomGroup group)
-        {
-            string nodeName = node.Key.ToLower();
-
-            node.Group = group;
-
-            if (!groupedNodes.ContainsKey(group))
-            {
-                groupedNodes.Add(group, new SerializableDictionary<string, DSNodeErrorData>());
-            }
-
-            if (!groupedNodes[group].ContainsKey(nodeName))
-            {
-                DSNodeErrorData nodeErrorData = new DSNodeErrorData();
-
-                nodeErrorData.Nodes.Add(node);
-
-                groupedNodes[group].Add(nodeName, nodeErrorData);
-
-                return;
-            }
-
-            List<CustomNode> groupedNodesList = groupedNodes[group][nodeName].Nodes;
-
-            groupedNodesList.Add(node);
-
-            Color errorColor = groupedNodes[group][nodeName].ErrorData.Color;
-
-            node.SetErrorStyle(errorColor);
-
-            if (groupedNodesList.Count == 2)
-            {
-                ++NameErrorsAmount;
-
-                groupedNodesList[0].SetErrorStyle(errorColor);
-            }
-        }
-
-        public void RemoveGroupedNode(CustomNode node, CustomGroup group)
-        {
-            string nodeName = node.Key.ToLower();
-
-            node.Group = null;
-
-            List<CustomNode> groupedNodesList = groupedNodes[group][nodeName].Nodes;
-
-            groupedNodesList.Remove(node);
-
-            node.ResetStyle();
-
-            if (groupedNodesList.Count == 1)
-            {
-                --NameErrorsAmount;
-
-                groupedNodesList[0].ResetStyle();
-
-                return;
-            }
-
-            if (groupedNodesList.Count == 0)
-            {
-                groupedNodes[group].Remove(nodeName);
-
-                if (groupedNodes[group].Count == 0)
-                {
-                    groupedNodes.Remove(group);
-                }
-            }
-        }
-
-        private void AddGridBackground()
-        {
-            GridBackground gridBackground = new GridBackground();
-
-            gridBackground.StretchToParentSize();
-
-            Insert(0, gridBackground);
-        }
-
-        private void AddSearchWindow()
-        {
-            if (searchWindow == null)
-            {
-                searchWindow = ScriptableObject.CreateInstance<NovelSearchWindow>();
-            }
-
-            searchWindow.Initialize(this);
-
-            nodeCreationRequest = context => SearchWindow.Open(new SearchWindowContext(context.screenMousePosition), searchWindow);
-        }
-
-        private void AddMiniMap()
-        {
-            miniMap = new MiniMap()
-            {
-                anchored = true
-            };
-
-            miniMap.SetPosition(new Rect(15, 50, 200, 180));
-
-            Add(miniMap);
-
-            miniMap.visible = false;
-        }
-
-        private void AddStyles()
-        {
-            this.AddStyleSheets(
-                "DialogueSystem/DSGraphViewStyles.uss",
-                "DialogueSystem/DSNodeStyles.uss"
-            );
-        }
-
-        private void AddMiniMapStyles()
-        {
-            StyleColor backgroundColor = new StyleColor(new Color32(29, 29, 30, 255));
-            StyleColor borderColor = new StyleColor(new Color32(51, 51, 51, 255));
-
-            miniMap.style.backgroundColor = backgroundColor;
-            miniMap.style.borderTopColor = borderColor;
-            miniMap.style.borderRightColor = borderColor;
-            miniMap.style.borderBottomColor = borderColor;
-            miniMap.style.borderLeftColor = borderColor;
-        }
-
-        public Vector2 GetLocalMousePosition(Vector2 mousePosition, bool isSearchWindow = false)
-        {
-            Vector2 worldMousePosition = mousePosition;
-
-            if (isSearchWindow)
-            {
-                worldMousePosition = editorWindow.rootVisualElement.ChangeCoordinatesTo(editorWindow.rootVisualElement.parent, mousePosition - editorWindow.position.position);
-            }
-
-            Vector2 localMousePosition = contentViewContainer.WorldToLocal(worldMousePosition);
-
-            return localMousePosition;
-        }
-
-        public void ClearGraph()
-        {
-            graphElements.ForEach(graphElement => RemoveElement(graphElement));
-
-            groups.Clear();
-            groupedNodes.Clear();
-            ungroupedNodes.Clear();
-
-            NameErrorsAmount = 0;
-        }
-
-        public void ToggleMiniMap()
-        {
-            miniMap.visible = !miniMap.visible;
-        }
+        
+        private Vector2 GetGraphMousePosition(Vector2 mousePosition) => contentViewContainer.WorldToLocal(mousePosition);
     }
 }
