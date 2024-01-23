@@ -11,25 +11,38 @@ namespace Game.NovelVisualization.Editor
         public string Key { get; private set; }
         public List<TransitionData> Transitions { get; set; }
         public string MetaData { get; set; }
-
-        public event Action<GraphNode, string> ChangeKeyEvent;
+        
         public event Action<List<GraphElement>> DeleteElementsRequestEvent;
+        public event Func<GraphNode, string, string, string> ChangeKeyFunc; 
 
-        public void Initialize(Vector2 position)
+        private Port _inputPort;
+        
+        public void Initialize(string key, List<TransitionData> transitionsDates = null, string metaData = null)
         {
-            Key = "DefaultKey";
+            Key = key;
             Transitions = new List<TransitionData>();
-            MetaData = "Enter Meta Data";
+
+            if (transitionsDates == null)
+            {
+                CreateTransitionPort();
+            }
+            else
+            {
+                foreach (var transitionData in transitionsDates)
+                {
+                    CreateTransitionPort(transitionData);
+                }
+            }
             
-            SetPosition(new Rect(position, Vector2.zero));
-            
-            CreateTransitionPort();
-            
+            MetaData = metaData ?? "Enter Meta Data";
+
             mainContainer.AddToClassList("ng-node__main-container");
             extensionContainer.AddToClassList("ng-node__extension-container");
+
+            CreateElements();
         }
         
-        public void Draw()
+        private void CreateElements()
         {
             var keyTextField = new TextField()
             {
@@ -53,9 +66,9 @@ namespace Game.NovelVisualization.Editor
             
             mainContainer.Insert(1, addTransitionButton);
 
-            var inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(bool));
-            inputPort.portName = "Input";
-            inputContainer.Add(inputPort);
+            _inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(bool));
+            _inputPort.portName = "Input";
+            inputContainer.Add(_inputPort);
 
             var foldout = new Foldout()
             {
@@ -65,6 +78,7 @@ namespace Game.NovelVisualization.Editor
             var metaDataTextField = new TextField()
             {
                 value = MetaData,
+                multiline = true,
             };
             
             metaDataTextField.AddToClassList("ng-node__text-field");
@@ -79,11 +93,11 @@ namespace Game.NovelVisualization.Editor
 
         private void OnClickAddTransitionButton() => CreateTransitionPort();
 
-        private void CreateTransitionPort()
+        private void CreateTransitionPort(TransitionData transitionData = null)
         {
-            var transitionData = new TransitionData()
+            transitionData ??= new TransitionData()
             {
-                key = "Transition",
+                value = "Transition",
             };
             
             var transitionPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single, typeof(bool));
@@ -93,12 +107,12 @@ namespace Game.NovelVisualization.Editor
 
             var transitionTextField = new TextField()
             {
-                value = transitionData.key,
+                value = transitionData.value,
             };
 
             transitionTextField.RegisterValueChangedCallback(callback =>
             {
-                transitionData.key = callback.newValue;
+                transitionData.value = callback.newValue;
             });
                 
             transitionTextField.AddToClassList("ng-node__text-field");
@@ -148,13 +162,15 @@ namespace Game.NovelVisualization.Editor
 
         private void OnKeyFieldChange(ChangeEvent<string> value)
         {
-            var field = (TextField)value.target;
+            Key = ChangeKeyFunc?.Invoke(this, value.previousValue, value.newValue);
+            
+            (value.target as TextField)?.SetValueWithoutNotify(Key);
 
-            var lastKey = Key;
-            
-            Key = value.newValue;
-            
-            ChangeKeyEvent?.Invoke(this, lastKey);
+            foreach (var edge in _inputPort.connections)
+            {
+                var transitionData = (TransitionData)edge.output.userData;
+                transitionData.nodeKey = Key;
+            }
         }
     }
 }

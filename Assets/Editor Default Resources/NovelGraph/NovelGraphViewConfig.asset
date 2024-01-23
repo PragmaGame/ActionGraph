@@ -12,4 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a975f21aac6e4abe8092d6b698df040a, type: 3}
   m_Name: NovelGraphViewConfig
   m_EditorClassIdentifier: 
+  <DefaultColor>k__BackingField: {r: 0.11372549, g: 0.11372549, b: 0.11764706, a: 1}
   <ErrorColor>k__BackingField: {r: 1, g: 0, b: 0.019788265, a: 1}
+  <DefaultKeyNode>k__BackingField: DefaultKey
+  <KeyValidatorParam>k__BackingField:
+    _patterns:
+    - value1: \s+
+      value2: '-'
+    - value1: '[^a-z0-9\-]'
+      value2: 

@@ -8,6 +8,9 @@ namespace Game.NovelVisualization.Editor
         [field: SerializeField] public Color DefaultColor { get; private set; } = ParseHtmlToColor("#1D1D1E");
         [field: SerializeField] public Color ErrorColor { get; private set; }
 
+        [field: SerializeField] public string DefaultKeyNode { get; private set; } = "DefaultKey";
+        [field: SerializeField] public KeyValidatorParam KeyValidatorParam { get; private set; }
+
         private static Color ParseHtmlToColor(string colorString)
         {
             ColorUtility.TryParseHtmlString(colorString, out var color);

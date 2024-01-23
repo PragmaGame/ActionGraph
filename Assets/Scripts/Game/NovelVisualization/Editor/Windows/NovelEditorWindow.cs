@@ -1,12 +1,14 @@
-﻿using System;
-using UnityEditor;
-using UnityEditor.UIElements;
+﻿using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Game.NovelVisualization.Editor
 {
     public class NovelEditorWindow : EditorWindow
     {
+        private NovelGraphView _novelGraphView;
+        private NovelToolBar _novelToolBar;
+
         [MenuItem("Novel/Novel Graph")]
         public static void Open()
         {
@@ -16,6 +18,8 @@ namespace Game.NovelVisualization.Editor
         private void OnEnable()
         {
             AddGraphView();
+            AddToolBar();
+            
             AddStyles();
         }
 
@@ -28,16 +32,45 @@ namespace Game.NovelVisualization.Editor
 
         private void AddGraphView()
         {
-            var graphView = new NovelGraphView();
+            _novelGraphView = new NovelGraphView();
+
+            _novelGraphView.StretchToParentSize();
             
-            graphView.StretchToParentSize();
-            
-            rootVisualElement.Add(graphView);
+            rootVisualElement.Add(_novelGraphView);
         }
 
         private void AddToolBar()
         {
-            var toolbar = new Toolbar();
+            _novelToolBar = new NovelToolBar();
+            
+            var toolbar = _novelToolBar.Initialize();
+
+            _novelToolBar.ClickSaveButtonEvent += OnClickSaveButton;
+            _novelToolBar.ClickLoadButtonEvent += OnClickLoadButton;
+            _novelToolBar.ClickMiniMapButtonEvent += OnClickMiniMapButton;
+            _novelToolBar.ChangeSearchFieldEvent += OnChangeSearchField;
+
+            rootVisualElement.Add(toolbar);
+        }
+
+        private void OnClickSaveButton(string filePath)
+        {
+            GraphSaveUtility.Save(_novelGraphView, filePath);
+        }
+
+        private void OnClickLoadButton(string filePath)
+        {
+            GraphSaveUtility.Load(_novelGraphView, filePath);
+        }
+        
+        private void OnClickMiniMapButton()
+        {
+            _novelGraphView.SwitchActiveMiniMap();
+        }
+
+        private void OnChangeSearchField(string value)
+        {
+            _novelGraphView.LookAt(value);
         }
     }
 }

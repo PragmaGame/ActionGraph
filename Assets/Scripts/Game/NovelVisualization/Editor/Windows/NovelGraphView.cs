@@ -10,39 +10,60 @@ namespace Game.NovelVisualization.Editor
     public class NovelGraphView : GraphView
     {
         private NovelGraphViewConfig _config;
+        
+        private MiniMap _miniMap;
 
-        private Dictionary<string, List<GraphNode>> _uniqueNodesKeys;
+        private Dictionary<string, List<GraphNode>> _keysMap;
+
+        private KeyValidator _validator;
 
         public NovelGraphView()
         {
             AddManipulators();
             AddGridBackground();
+            AddMiniMap();
             AddStyles();
 
-            SetElementsDeletedCallback();
+            //SetElementsDeletedCallback();
             SetGraphViewChangedCallback();
             
             _config = (NovelGraphViewConfig)EditorGUIUtility.Load("NovelGraph/NovelGraphViewConfig.asset");
 
-            _uniqueNodesKeys = new Dictionary<string, List<GraphNode>>();
+            _keysMap = new Dictionary<string, List<GraphNode>>();
+
+            _validator = new KeyValidator(_config.KeyValidatorParam);
         }
-        
+
         private void AddManipulators()
         {
             this.AddManipulator(new ContentDragger());
             this.AddManipulator(new ContentZoomer());
             this.AddManipulator(new SelectionDragger());
             this.AddManipulator(new RectangleSelector());
-            
+
             this.AddManipulator(CreateNodeContextMenu());
             this.AddManipulator(CreateGroupContextMenu());
+        }
+        
+        private void AddMiniMap()
+        {
+            _miniMap = new MiniMap()
+            {
+                anchored = true
+            };
+
+            _miniMap.SetPosition(new Rect(15, 50, 200, 180));
+
+            Add(_miniMap);
+
+            _miniMap.visible = false;
         }
         
         private IManipulator CreateNodeContextMenu()
         {
             var contextualMenuManipulator = new ContextualMenuManipulator(
                 menuEvent => menuEvent.menu.InsertAction(0,"Create Node", 
-                    action => AddElement(CreateNode(GetGraphMousePosition(action.eventInfo.localMousePosition))))
+                    action => CreateNode(GetGraphMousePosition(action.eventInfo.localMousePosition)))
             );
 
             return contextualMenuManipulator;
@@ -56,6 +77,75 @@ namespace Game.NovelVisualization.Editor
             );
 
             return contextualMenuManipulator;
+        }
+        
+        public void LoadSnapshotData(GraphSnapshotData graphSnapshotData)
+        {
+            DeleteAll();
+            
+            var graphNodes = new Dictionary<string, GraphNode>();
+
+            foreach (var nodeData in graphSnapshotData.nodes)
+            {
+                var node = CreateNode(nodeData.position, nodeData.key, nodeData.transitions, nodeData.metaData);
+                
+                graphNodes.Add(node.Key, node);
+            }
+
+            foreach (var graphNode in graphNodes)
+            {
+                foreach (Port transitionPort in graphNode.Value.outputContainer.Children())
+                {
+                    var transitionData = (TransitionData)transitionPort.userData;
+
+                    if (string.IsNullOrEmpty(transitionData.nodeKey))
+                    {
+                        continue;
+                    }
+
+                    var nextNode = graphNodes[transitionData.nodeKey];
+
+                    Port nextNodeInputPort = (Port)nextNode.inputContainer.Children().First();
+
+                    Edge edge = transitionPort.ConnectTo(nextNodeInputPort);
+
+                    AddElement(edge);
+
+                    graphNode.Value.RefreshPorts();
+                }
+            }
+        }
+
+        public GraphSnapshotData SnapshotGraph()
+        {
+            var graphSnapshotData = new GraphSnapshotData();
+
+            foreach (var element in graphElements)
+            {
+                if (element is GraphNode node)
+                {
+                    graphSnapshotData.nodes.Add(new NodeData()
+                    {
+                        key = node.Key,
+                        metaData = node.MetaData,
+                        transitions = node.Transitions.Clone(),
+                        position = node.GetPosition().position
+                    });
+                }
+
+                if (element is Group group)
+                {
+                    graphSnapshotData.groups.Add(new GroupData()
+                    {
+                        key = group.title,
+                        position = group.GetPosition().position
+                    });
+
+                    //group.containedElements;
+                }
+            }
+
+            return graphSnapshotData;
         }
 
         private Group CreateGroup(Vector2 position)
@@ -80,16 +170,31 @@ namespace Game.NovelVisualization.Editor
             return group;
         }
         
-        private GraphNode CreateNode(Vector2 position)
+        private GraphNode CreateNode(Vector2 position, string key = null, List<TransitionData> transitionsDates = null, string metaData = null)
         {
             var node = new GraphNode();
+            key ??= _config.DefaultKeyNode;
             
-            node.Initialize(position);
-            node.Draw();
+            node.Initialize(key, transitionsDates, metaData);
+            
+            AddElement(node);
+            
+            node.SetPosition(new Rect(position, Vector2.one));
 
             RegisterNode(node);
 
             return node;
+        }
+
+        public void LookAt(string nodeKey)
+        {
+            foreach (var node in nodes)
+            {
+                if (node is GraphNode graphNode && graphNode.Key.Contains(nodeKey))
+                {
+                    UpdateViewTransform(contentViewContainer.ChangeCoordinatesTo(graphNode, viewport.contentRect.center - graphNode.contentRect.center), Vector3.one);
+                }
+            }
         }
 
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)
@@ -134,10 +239,10 @@ namespace Game.NovelVisualization.Editor
 
         private void RegisterNode(GraphNode node)
         {
-            node.ChangeKeyEvent += OnRevalidateKey;
+            node.ChangeKeyFunc += OnRevalidateKey;
             node.DeleteElementsRequestEvent += OnDeleteElements;
             
-            ValidateKey(node);
+            AddKeyToMap(node);
         }
 
         private void OnDeleteElements(List<GraphElement> elements)
@@ -145,91 +250,110 @@ namespace Game.NovelVisualization.Editor
             DeleteElements(elements);
         }
 
-        private void ValidateKey(GraphNode node)
+        private void AddKeyToMap(GraphNode node, string key = null)
         {
-            var key = node.Key;
+            key ??= node.Key;
             
-            if (_uniqueNodesKeys.ContainsKey(key))
+            if (_keysMap.ContainsKey(key))
             {
-                if (_uniqueNodesKeys[key].Count == 1)
+                if (_keysMap[key].Count == 1)
                 {
-                    _uniqueNodesKeys[key][0].SetBackgroundColor(_config.ErrorColor);
+                    _keysMap[key][0].SetBackgroundColor(_config.ErrorColor);
                 }
                 
-                _uniqueNodesKeys[key].Add(node);
+                _keysMap[key].Add(node);
                 
                 node.SetBackgroundColor(_config.ErrorColor);
             }
             else
             {
-                _uniqueNodesKeys.Add(node.Key, new List<GraphNode>() {node});
+                _keysMap.Add(key, new List<GraphNode>() {node});
             }
         }
 
-        private void RemoveKey(GraphNode node, string key = null)
+        private void RemoveKeyFromMap(GraphNode node, string key = null)
         {
             key ??= node.Key;
             
-            _uniqueNodesKeys[key].Remove(node);
+            _keysMap[key].Remove(node);
             
             node.SetBackgroundColor(_config.DefaultColor);
 
-            switch (_uniqueNodesKeys[key].Count)
+            switch (_keysMap[key].Count)
             {
                 case 1:
                 {
-                    _uniqueNodesKeys[key][0].SetBackgroundColor(_config.DefaultColor);
+                    _keysMap[key][0].SetBackgroundColor(_config.DefaultColor);
                     break;
                 }
                 case 0:
                 {
-                    _uniqueNodesKeys.Remove(key);
+                    _keysMap.Remove(key);
                     break;
                 }
             }
         }
 
-        private void OnRevalidateKey(GraphNode node, string oldKey)
+        private string OnRevalidateKey(GraphNode node, string oldKey, string newKey)
         {
-            RemoveKey(node, oldKey);
-            
-            ValidateKey(node);
+            if (_validator.TryValidate(newKey, out var result))
+            {
+                RemoveKeyFromMap(node, oldKey);
+                AddKeyToMap(node, result);
+
+                return result;
+            }
+
+            return _config.DefaultKeyNode;
         }
         
-        private void SetElementsDeletedCallback()
-        {
-            deleteSelection = (_, _) =>
-            {
-                var connections = new HashSet<Edge>();
-                
-                foreach (var selectable in selection)
-                {
-                    if (selectable is not GraphNode graphNode)
-                    {
-                        continue;
-                    }
-                    
-                    graphNode.ChangeKeyEvent -= OnRevalidateKey;
-                    graphNode.DeleteElementsRequestEvent -= OnDeleteElements;
-                    RemoveKey(graphNode);
-                    
-                    graphNode.Query<Port>().ForEach(port =>
-                    {
-                        if (!port.connected)
-                        {
-                            return;
-                        }
-
-                        connections.UnionWith(port.connections);
-                    });
-                }
-
-                connections.Remove(null);
-                
-                DeleteElements(connections);
-                DeleteElements(selection.OfType<GraphElement>());
-            };
-        }
+        // private void SetElementsDeletedCallback()
+        // {
+        //     deleteSelection = (_, _) =>
+        //     {
+        //         foreach (var selectable in selection)
+        //         {
+        //             if (selectable is not GraphNode graphNode)
+        //             {
+        //                 continue;
+        //             }
+        //             
+        //             graphNode.ChangeKeyFunc -= OnRevalidateKey;
+        //             graphNode.DeleteElementsRequestEvent -= OnDeleteElements;
+        //             RemoveKeyFromMap(graphNode);
+        //         }
+        //
+        //         DeleteSelection();
+        //         // var connections = new HashSet<Edge>();
+        //         //
+        //         // foreach (var selectable in selection)
+        //         // {
+        //         //     if (selectable is not GraphNode graphNode)
+        //         //     {
+        //         //         continue;
+        //         //     }
+        //         //     
+        //         //     graphNode.ChangeKeyFunc -= OnRevalidateKey;
+        //         //     graphNode.DeleteElementsRequestEvent -= OnDeleteElements;
+        //         //     RemoveKeyFromMap(graphNode);
+        //         //     
+        //         //     graphNode.Query<Port>().ForEach(port =>
+        //         //     {
+        //         //         if (!port.connected)
+        //         //         {
+        //         //             return;
+        //         //         }
+        //         //
+        //         //         connections.UnionWith(port.connections);
+        //         //     });
+        //         // }
+        //         //
+        //         // connections.Remove(null);
+        //         //
+        //         // DeleteElements(connections);
+        //         // DeleteElements(selection.OfType<GraphElement>());
+        //     };
+        // }
 
         private void SetGraphViewChangedCallback()
         {
@@ -251,11 +375,21 @@ namespace Game.NovelVisualization.Editor
                 {
                     foreach (var element in changes.elementsToRemove)
                     {
-                        if (element is Edge edge)
+                        switch (element)
                         {
-                            var transitionData = (TransitionData)edge.output.userData;
-
-                            transitionData.nodeKey = string.Empty;
+                            case Edge edge:
+                            {
+                                var transitionData = (TransitionData)edge.output.userData;
+                                transitionData.nodeKey = string.Empty;
+                                break;
+                            }
+                            case GraphNode graphNode:
+                            {
+                                graphNode.ChangeKeyFunc -= OnRevalidateKey;
+                                graphNode.DeleteElementsRequestEvent -= OnDeleteElements;
+                                RemoveKeyFromMap(graphNode);
+                                break;
+                            }
                         }
                     }
                 }
@@ -264,6 +398,16 @@ namespace Game.NovelVisualization.Editor
             };
         }
         
+        public void SwitchActiveMiniMap()
+        {
+            _miniMap.visible = !_miniMap.visible;
+        }
+        
         private Vector2 GetGraphMousePosition(Vector2 mousePosition) => contentViewContainer.WorldToLocal(mousePosition);
+
+        public void DeleteAll()
+        {
+            DeleteElements(graphElements);
+        }
     }
 }
