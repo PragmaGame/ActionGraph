@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Game.NovelVisualization.Editor
+namespace Game.Core.ActionGraph.Runtime
 {
     [Serializable]
-    public class NodeData
+    public class GroupData
     {
         public string key;
-        public string metaData;
-        public List<TransitionData> transitions;
+        public List<string> ownedNodesKeys;
+        
         public Vector2 position;
     }
 }

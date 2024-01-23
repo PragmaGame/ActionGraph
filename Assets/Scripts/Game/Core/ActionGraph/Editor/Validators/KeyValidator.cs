@@ -1,7 +1,6 @@
 ﻿using System.Text.RegularExpressions;
-using UnityEngine;
 
-namespace Game.NovelVisualization.Editor
+namespace Game.Core.ActionGraph.Editor
 {
     public class KeyValidator
     {

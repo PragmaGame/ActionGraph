@@ -20,22 +20,10 @@ MonoBehaviour:
       transitions:
       - value: Transition
         nodeKey: t2
-      position: {x: -150, y: 21}
+      position: {x: 544, y: 336}
     - key: t2
       metaData: Enter Meta Data
       transitions:
       - value: Transition
         nodeKey: 
-      position: {x: 441, y: 45}
-    - key: t3
-      metaData: Enter Meta Data
-      transitions:
-      - value: Transition
-        nodeKey: t2
-      position: {x: -44, y: 313}
-    - key: t4
-      metaData: Enter Meta Data
-      transitions:
-      - value: Transition
-        nodeKey: t1
-      position: {x: -548, y: 295}
+      position: {x: 986, y: 350}

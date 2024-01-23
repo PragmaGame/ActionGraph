@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using Common;
-using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace Game.NovelVisualization.Editor
+namespace Game.Core.ActionGraph.Editor
 {
     [Serializable]
     public class KeyValidatorParam

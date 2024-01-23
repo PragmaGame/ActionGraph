@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using Game.Core.ActionGraph.Runtime;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Game.NovelVisualization.Editor
+namespace Game.Core.ActionGraph.Editor
 {
-    public class GraphNode : Node
+    public class ActionNode : Node
     {
         public string Key { get; private set; }
         public List<TransitionData> Transitions { get; set; }
         public string MetaData { get; set; }
         
         public event Action<List<GraphElement>> DeleteElementsRequestEvent;
-        public event Func<GraphNode, string, string, string> ChangeKeyFunc; 
+        public event Func<ActionNode, string, string, string> ChangeKeyFunc; 
 
         private Port _inputPort;
         
@@ -83,8 +84,13 @@ namespace Game.NovelVisualization.Editor
             
             metaDataTextField.AddToClassList("ng-node__text-field");
             metaDataTextField.AddToClassList("ng-node__quote-text-field");
+
             
+            // var a = Enum.GetNames(typeof(MetaDataTypes)).ToList();
+            // var metaDataDropdown = new DropdownField(a, 0);
+
             foldout.Add(metaDataTextField);
+            //foldout.Add(metaDataDropdown);
 
             extensionContainer.Add(foldout);
             
@@ -97,7 +103,7 @@ namespace Game.NovelVisualization.Editor
         {
             transitionData ??= new TransitionData()
             {
-                value = "Transition",
+                value = "transition",
             };
             
             var transitionPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single, typeof(bool));

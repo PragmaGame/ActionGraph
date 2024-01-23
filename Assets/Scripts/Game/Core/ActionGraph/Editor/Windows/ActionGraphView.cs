@@ -1,23 +1,24 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Game.Core.ActionGraph.Runtime;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Game.NovelVisualization.Editor
+namespace Game.Core.ActionGraph.Editor
 {
-    public class NovelGraphView : GraphView
+    public class ActionGraphView : GraphView
     {
-        private NovelGraphViewConfig _config;
+        private ActionGraphViewConfig _config;
         
         private MiniMap _miniMap;
 
-        private Dictionary<string, List<GraphNode>> _keysMap;
+        private Dictionary<string, List<ActionNode>> _keysMap;
 
         private KeyValidator _validator;
 
-        public NovelGraphView()
+        public ActionGraphView()
         {
             AddManipulators();
             AddGridBackground();
@@ -27,9 +28,9 @@ namespace Game.NovelVisualization.Editor
             //SetElementsDeletedCallback();
             SetGraphViewChangedCallback();
             
-            _config = (NovelGraphViewConfig)EditorGUIUtility.Load("NovelGraph/NovelGraphViewConfig.asset");
+            _config = (ActionGraphViewConfig)EditorGUIUtility.Load("NovelGraph/NovelGraphViewConfig.asset");
 
-            _keysMap = new Dictionary<string, List<GraphNode>>();
+            _keysMap = new Dictionary<string, List<ActionNode>>();
 
             _validator = new KeyValidator(_config.KeyValidatorParam);
         }
@@ -83,16 +84,16 @@ namespace Game.NovelVisualization.Editor
         {
             DeleteAll();
             
-            var graphNodes = new Dictionary<string, GraphNode>();
+            var actionNodes = new Dictionary<string, ActionNode>();
 
             foreach (var nodeData in graphSnapshotData.nodes)
             {
                 var node = CreateNode(nodeData.position, nodeData.key, nodeData.transitions, nodeData.metaData);
                 
-                graphNodes.Add(node.Key, node);
+                actionNodes.Add(node.Key, node);
             }
 
-            foreach (var graphNode in graphNodes)
+            foreach (var graphNode in actionNodes)
             {
                 foreach (Port transitionPort in graphNode.Value.outputContainer.Children())
                 {
@@ -103,7 +104,7 @@ namespace Game.NovelVisualization.Editor
                         continue;
                     }
 
-                    var nextNode = graphNodes[transitionData.nodeKey];
+                    var nextNode = actionNodes[transitionData.nodeKey];
 
                     Port nextNodeInputPort = (Port)nextNode.inputContainer.Children().First();
 
@@ -114,6 +115,16 @@ namespace Game.NovelVisualization.Editor
                     graphNode.Value.RefreshPorts();
                 }
             }
+
+            foreach (var groupData in graphSnapshotData.groups)
+            {
+                var group = CreateGroup(groupData.position, groupData.key);
+
+                foreach (var groupNodeKey in groupData.ownedNodesKeys)
+                {
+                    group.AddElement(actionNodes[groupNodeKey]);
+                }
+            }
         }
 
         public GraphSnapshotData SnapshotGraph()
@@ -122,7 +133,7 @@ namespace Game.NovelVisualization.Editor
 
             foreach (var element in graphElements)
             {
-                if (element is GraphNode node)
+                if (element is ActionNode node)
                 {
                     graphSnapshotData.nodes.Add(new NodeData()
                     {
@@ -135,24 +146,33 @@ namespace Game.NovelVisualization.Editor
 
                 if (element is Group group)
                 {
-                    graphSnapshotData.groups.Add(new GroupData()
+                    var groupData = new GroupData()
                     {
                         key = group.title,
-                        position = group.GetPosition().position
-                    });
+                        position = group.GetPosition().position,
+                        ownedNodesKeys = new List<string>()
+                    };
+                    
+                    graphSnapshotData.groups.Add(groupData);
 
-                    //group.containedElements;
+                    foreach (var groupElement in group.containedElements)
+                    {
+                        if (groupElement is ActionNode ownGroupNode)
+                        {
+                            groupData.ownedNodesKeys.Add(ownGroupNode.Key);
+                        }
+                    }
                 }
             }
 
             return graphSnapshotData;
         }
 
-        private Group CreateGroup(Vector2 position)
+        private Group CreateGroup(Vector2 position, string groupName = "DefaultGroupName")
         {
             var group = new Group()
             {
-                title = "DefaultGroupName"
+                title = groupName,
             };
 
             AddElement(group);
@@ -161,7 +181,7 @@ namespace Game.NovelVisualization.Editor
 
             foreach(var selected in selection)
             {
-                if (selected is GraphNode graphNode)
+                if (selected is ActionNode graphNode)
                 {
                     group.AddElement(graphNode);
                 }
@@ -170,9 +190,9 @@ namespace Game.NovelVisualization.Editor
             return group;
         }
         
-        private GraphNode CreateNode(Vector2 position, string key = null, List<TransitionData> transitionsDates = null, string metaData = null)
+        private ActionNode CreateNode(Vector2 position, string key = null, List<TransitionData> transitionsDates = null, string metaData = null)
         {
-            var node = new GraphNode();
+            var node = new ActionNode();
             key ??= _config.DefaultKeyNode;
             
             node.Initialize(key, transitionsDates, metaData);
@@ -190,9 +210,9 @@ namespace Game.NovelVisualization.Editor
         {
             foreach (var node in nodes)
             {
-                if (node is GraphNode graphNode && graphNode.Key.Contains(nodeKey))
+                if (node is ActionNode actionNode && actionNode.Key.Contains(nodeKey))
                 {
-                    UpdateViewTransform(contentViewContainer.ChangeCoordinatesTo(graphNode, viewport.contentRect.center - graphNode.contentRect.center), Vector3.one);
+                    UpdateViewTransform(contentViewContainer.ChangeCoordinatesTo(actionNode, viewport.contentRect.center - actionNode.contentRect.center), Vector3.one);
                 }
             }
         }
@@ -237,7 +257,7 @@ namespace Game.NovelVisualization.Editor
             Insert(0, gridBackground);
         }
 
-        private void RegisterNode(GraphNode node)
+        private void RegisterNode(ActionNode node)
         {
             node.ChangeKeyFunc += OnRevalidateKey;
             node.DeleteElementsRequestEvent += OnDeleteElements;
@@ -250,7 +270,7 @@ namespace Game.NovelVisualization.Editor
             DeleteElements(elements);
         }
 
-        private void AddKeyToMap(GraphNode node, string key = null)
+        private void AddKeyToMap(ActionNode node, string key = null)
         {
             key ??= node.Key;
             
@@ -267,11 +287,11 @@ namespace Game.NovelVisualization.Editor
             }
             else
             {
-                _keysMap.Add(key, new List<GraphNode>() {node});
+                _keysMap.Add(key, new List<ActionNode>() {node});
             }
         }
 
-        private void RemoveKeyFromMap(GraphNode node, string key = null)
+        private void RemoveKeyFromMap(ActionNode node, string key = null)
         {
             key ??= node.Key;
             
@@ -294,7 +314,7 @@ namespace Game.NovelVisualization.Editor
             }
         }
 
-        private string OnRevalidateKey(GraphNode node, string oldKey, string newKey)
+        private string OnRevalidateKey(ActionNode node, string oldKey, string newKey)
         {
             if (_validator.TryValidate(newKey, out var result))
             {
@@ -363,7 +383,7 @@ namespace Game.NovelVisualization.Editor
                 {
                     foreach (var edge in changes.edgesToCreate)
                     {
-                        var node = (GraphNode)edge.input.node;
+                        var node = (ActionNode)edge.input.node;
 
                         var transitionData = (TransitionData)edge.output.userData;
 
@@ -383,11 +403,11 @@ namespace Game.NovelVisualization.Editor
                                 transitionData.nodeKey = string.Empty;
                                 break;
                             }
-                            case GraphNode graphNode:
+                            case ActionNode actionNode:
                             {
-                                graphNode.ChangeKeyFunc -= OnRevalidateKey;
-                                graphNode.DeleteElementsRequestEvent -= OnDeleteElements;
-                                RemoveKeyFromMap(graphNode);
+                                actionNode.ChangeKeyFunc -= OnRevalidateKey;
+                                actionNode.DeleteElementsRequestEvent -= OnDeleteElements;
+                                RemoveKeyFromMap(actionNode);
                                 break;
                             }
                         }

@@ -3,9 +3,9 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
-namespace Game.NovelVisualization.Editor
+namespace Game.Core.ActionGraph.Editor
 {
-    public class NovelToolBar
+    public class ActionGraphToolBarView
     {
         private Toolbar _toolbar;
 
@@ -62,14 +62,14 @@ namespace Game.NovelVisualization.Editor
 
         private void OnClickLoadButton()
         {
-            var filePath = EditorUtility.OpenFilePanel("Novel Graphs", "Assets/", "asset");
+            var filePath = EditorUtility.OpenFilePanel("Action Graphs", "Assets/", "asset");
             
             ClickLoadButtonEvent?.Invoke(filePath);
         }
 
         private void OnClickSaveButton()
         {
-            var filePath = EditorUtility.SaveFilePanel("Novel Graphs", "Assets/","NovelGraphFileName","asset");
+            var filePath = EditorUtility.SaveFilePanel("Action Graphs", "Assets/","ActionGraphFileName","asset");
             
             ClickSaveButtonEvent?.Invoke(filePath);
         }

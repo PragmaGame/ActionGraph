@@ -1,9 +1,10 @@
-﻿using UnityEditor;
+﻿using Game.Core.ActionGraph.Runtime;
+using UnityEditor;
 using UnityEngine;
 
-namespace Game.NovelVisualization.Editor
+namespace Game.Core.ActionGraph.Editor
 {
-    public static class GraphSaveUtility
+    public static class ActionGraphSaveUtility
     {
         public static bool IsValidPath(string path, out string validPath)
         {
@@ -18,21 +19,21 @@ namespace Game.NovelVisualization.Editor
             return true;
         }
         
-        public static void Save(NovelGraphView graph, string path)
+        public static void Save(ActionGraphView graph, string path)
         {
             if (!IsValidPath(path, out var validPath))
             {
                 return;
             }
             
-            NovelGraphData graphData = GetOrCreate<NovelGraphData>(validPath);
+            ActionGraphData graphData = GetOrCreate<ActionGraphData>(validPath);
 
             graphData.graphSnapshotData = graph.SnapshotGraph();
             
             SaveAsset(graphData);
         }
 
-        public static void Load(NovelGraphView graph, string path)
+        public static void Load(ActionGraphView graph, string path)
         {
             if (!IsValidPath(path, out var validPath))
             {
@@ -41,7 +42,7 @@ namespace Game.NovelVisualization.Editor
             
             graph.DeleteAll();
 
-            var asset = AssetDatabase.LoadAssetAtPath<NovelGraphData>(validPath);
+            var asset = AssetDatabase.LoadAssetAtPath<ActionGraphData>(validPath);
             
             graph.LoadSnapshotData(asset.graphSnapshotData);
         }
