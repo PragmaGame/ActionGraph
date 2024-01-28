@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Game.Core.ActionGraph.Runtime
 {
@@ -9,11 +7,17 @@ namespace Game.Core.ActionGraph.Runtime
     {
         public string value;
         public string nodeKey;
-    }
 
-    public static class TransitionDataExtensions
-    {
-        public static List<TransitionData> Clone(this List<TransitionData> transitionData) => transitionData
-            .Select(data => new TransitionData { value = data.value, nodeKey = data.nodeKey }).ToList();
+        public TransitionData()
+        {
+        }
+        
+        public TransitionData(TransitionData data)
+        {
+            value = data.value;
+            nodeKey = data.nodeKey;
+        }
+
+        public TransitionData Clone() => new(this);
     }
 } 

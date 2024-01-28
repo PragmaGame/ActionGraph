@@ -137,7 +137,7 @@ namespace Game.Core.ActionGraph.Editor
                     {
                         key = node.Key,
                         metaData = node.MetaData,
-                        transitions = node.Transitions.Clone(),
+                        transitions = node.Transitions.Select(transition => transition.Clone()).ToList(),
                         position = node.GetPosition().position
                     });
                 }
@@ -190,11 +190,10 @@ namespace Game.Core.ActionGraph.Editor
         
         private ActionNode CreateNode(Vector2 position, string key = null, List<TransitionData> transitionsDates = null, string metaData = null)
         {
-            var node = new ActionNode();
             key ??= _config.DefaultKeyNode;
             
-            node.Initialize(key, transitionsDates, metaData);
-            
+            var node = new ActionNode(key, transitionsDates, metaData);
+
             AddElement(node);
             
             node.SetPosition(new Rect(position, Vector2.one));

@@ -28,7 +28,7 @@ namespace Game.Core.ActionGraph.Editor
             
             ActionGraphData graphData = GetOrCreate<ActionGraphData>(validPath);
 
-            graphData.graphSnapshotData = graph.SnapshotGraph();
+            graphData.SetSnapshotData(graph.SnapshotGraph());
             
             SaveAsset(graphData);
         }
@@ -44,7 +44,7 @@ namespace Game.Core.ActionGraph.Editor
 
             var asset = AssetDatabase.LoadAssetAtPath<ActionGraphData>(validPath);
             
-            graph.LoadSnapshotData(asset.graphSnapshotData);
+            graph.LoadSnapshotData(asset.GetSnapshotData());
         }
 
         public static T GetOrCreate<T>(string path) where T : ScriptableObject

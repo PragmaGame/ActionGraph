@@ -17,8 +17,8 @@ namespace Game.Core.ActionGraph.Editor
         public event Func<ActionNode, string, string, string> ChangeKeyFunc; 
 
         private Port _inputPort;
-        
-        public void Initialize(string key, List<TransitionData> transitionsDates = null, string metaData = null)
+
+        public ActionNode(string key, List<TransitionData> transitionsDates = null, string metaData = null)
         {
             Key = key;
             Transitions = new List<TransitionData>();
@@ -42,7 +42,7 @@ namespace Game.Core.ActionGraph.Editor
 
             CreateElements();
         }
-        
+
         private void CreateElements()
         {
             var keyTextField = new TextField()
