@@ -1,7 +1,7 @@
 ﻿using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace Game.Core.Graph
+namespace Game.Core.ActionGraph.Runtime
 {
     public partial class NodeMetaDataParser
     {

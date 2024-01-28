@@ -14,39 +14,54 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Id>k__BackingField: 
   _graphSnapshotData:
-    groups: []
+    groups:
+    - key: TestGroup1
+      ownedNodesKeys:
+      - t1
+      - t3
+      - t21
+      - t22
+      position: {x: 449, y: 97}
+    - key: TestGroup2
+      ownedNodesKeys:
+      - t5
+      position: {x: 2475, y: 186.00002}
     nodes:
-    - key: t2
-      metaData: Enter Meta Data
-      transitions:
-      - value: transition
-        nodeKey: transition
-      position: {x: 1113, y: 346}
-    - key: t3
-      metaData: Enter Meta Data
-      transitions:
-      - value: transition
-        nodeKey: transition
-      - value: transition
-        nodeKey: transition
-      position: {x: 676, y: 629}
-    - key: t4
-      metaData: Enter Meta Data
-      transitions:
-      - value: transition
-        nodeKey: transition
-      position: {x: 885, y: 106}
-    - key: t5
-      metaData: Enter Meta Data
-      transitions:
-      - value: transition
-        nodeKey: transition
-      position: {x: 225, y: 583}
     - key: t1
       metaData: Enter Meta Data
       transitions:
       - value: transition
-        nodeKey: transition
+        nodeKey: t21
       - value: transition
-        nodeKey: transition
-      position: {x: 225, y: 218}
+        nodeKey: t22
+      position: {x: 474, y: 249}
+    - key: t3
+      metaData: Enter Meta Data
+      transitions:
+      - value: transition
+        nodeKey: t4
+      position: {x: 1320, y: 249}
+    - key: t21
+      metaData: Enter Meta Data
+      transitions:
+      - value: transition
+        nodeKey: t3
+      position: {x: 891, y: 156}
+    - key: t22
+      metaData: Enter Meta Data
+      transitions:
+      - value: transition
+        nodeKey: t3
+      position: {x: 891, y: 413}
+    - key: t4
+      metaData: Enter Meta Data
+      transitions:
+      - value: transition
+        nodeKey: t5
+      position: {x: 1939, y: 217}
+    - key: t5
+      metaData: Enter Meta Data
+      transitions:
+      - value: transition
+        nodeKey: 
+      position: {x: 2500, y: 245}

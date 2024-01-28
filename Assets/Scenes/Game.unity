@@ -677,10 +677,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1117505633}
-  - component: {fileID: 1117505635}
   - component: {fileID: 1117505634}
   m_Layer: 0
-  m_Name: GameGraph
+  m_Name: GraphActionHub
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -714,35 +713,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _graphActions:
-  - _id: 
-    _processorHubs:
-    - _processRunner:
-        rid: -2
-      _processors:
-      - rid: 1689203271632945160
+  - _key: t1
+    _processorHubs: []
+  - _key: t3
+    _processorHubs: []
+  - _key: t21
+    _processorHubs: []
+  - _key: t22
+    _processorHubs: []
+  - _key: t4
+    _processorHubs: []
+  - _key: t5
+    _processorHubs: []
+  _data: {fileID: 11400000, guid: 82c36f4dc5e144246add67191ba74483, type: 2}
+  _isUseGroupKey: 0
+  _groupKey: TestGroup1
   references:
     version: 2
-    RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
-    - rid: 1689203271632945160
-      type: {class: TextProcessor, ns: Game.Core.Hub.Processors, asm: Assembly-CSharp}
-      data:
-        _speakerName: 
-        _text: 
---- !u!114 &1117505635
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1117505632}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a52f2d216f7d4f34a4d32480b523fc73, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _parser: {fileID: 11400000, guid: 7c6059f33d049d444b1f8ce76c37113a, type: 2}
+    RefIds: []
 --- !u!1 &1176618514
 GameObject:
   m_ObjectHideFlags: 0
@@ -893,6 +881,8 @@ GameObject:
   - component: {fileID: 1247315594}
   - component: {fileID: 1247315596}
   - component: {fileID: 1247315595}
+  - component: {fileID: 1247315598}
+  - component: {fileID: 1247315597}
   m_Layer: 5
   m_Name: MainText
   m_TagString: Untagged
@@ -1016,6 +1006,80 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1247315593}
   m_CullTransparentMesh: 1
+--- !u!114 &1247315597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1247315593}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57a6945b90dcd0c4b81619c0d8b5c283, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useTypeWriter: 1
+  startTypewriterMode: 3
+  hideAppearancesOnSkip: 0
+  hideDisappearancesOnSkip: 0
+  triggerEventsOnSkip: 0
+  resetTypingSpeedAtStartup: 1
+  disappearanceOrientation: 0
+  onTextShowed:
+    m_PersistentCalls:
+      m_Calls: []
+  onTypewriterStart:
+    m_PersistentCalls:
+      m_Calls: []
+  onTextDisappeared:
+    m_PersistentCalls:
+      m_Calls: []
+  onCharacterVisible:
+    m_PersistentCalls:
+      m_Calls: []
+  onMessage:
+    m_PersistentCalls:
+      m_Calls: []
+  waitForNormalChars: 0.03
+  waitLong: 0.6
+  waitMiddle: 0.2
+  avoidMultiplePunctuactionWait: 0
+  waitForNewLines: 1
+  waitForLastCharacter: 1
+  useTypewriterWaitForDisappearances: 1
+  disappearanceWaitTime: 0.015
+  disappearanceSpeedMultiplier: 1
+--- !u!114 &1247315598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1247315593}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8ace8ced0e81c847968cdca0aeda757, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  typewriterStartsAutomatically: 1
+  animationLoop: 0
+  timeScale: 0
+  _text: Hi. How Are You ?
+  useDynamicScaling: 1
+  referenceFontSize: 10
+  isResettingTimeOnNewText: 1
+  useDefaultDatabases: 1
+  databaseBehaviors: {fileID: 11400000, guid: afdda6910e409da4c8207086e1b2c263, type: 2}
+  databaseAppearances: {fileID: 11400000, guid: b1cf6fa75b719a545b3cf970d116b5df, type: 2}
+  useDefaultStyleSheet: 1
+  styleSheet: {fileID: 0}
+  databaseActions: {fileID: 11400000, guid: 03f8a96a562555c44b6f3d65721022f8, type: 2}
+  defaultAppearancesTags:
+  - size
+  defaultDisappearancesTags:
+  - fade
+  defaultBehaviorsTags: []
+  defaultTagsMode: 0
 --- !u!1 &2089356966
 GameObject:
   m_ObjectHideFlags: 0

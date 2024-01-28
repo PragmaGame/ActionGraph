@@ -1,4 +1,4 @@
-﻿namespace Game.Core.Graph
+﻿namespace Game.Core.ActionGraph.Runtime
 {
     public enum KeyMetaDataType
     {

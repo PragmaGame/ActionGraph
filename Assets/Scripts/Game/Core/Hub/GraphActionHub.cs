@@ -4,7 +4,7 @@ using Zenject;
 
 namespace Game.Core.Hub
 {
-    public class GraphActionHub : MonoBehaviour
+    public partial class GraphActionHub : MonoBehaviour
     {
         [SerializeField] private List<GraphAction> _graphActions;
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Game.Core.ActionGraph.Runtime;
 using Game.Core.Hub.ProcessRunners;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -12,13 +13,22 @@ namespace Game.Core.Hub
     [Serializable]
     public class GraphAction
     {
-        [SerializeField] private string _id;
+        [SerializeField, ValueDropdown("@ActionGraphDataEditorHelper.GetNodesGraphsKeys()", NumberOfItemsBeforeEnablingSearch = 1)] 
+        private string _key;
+        
         [SerializeField] private List<ProcessorHub> _processorHubs;
 
         private SequenceProcessRunner _runner;
         private CancellationTokenSource _cancellationTokenSource;
         
-        public string Id => _id;
+        public GraphAction()
+        {
+        }
+
+        public GraphAction(string key)
+        {
+            _key = key;
+        }
 
         [Inject]
         private void Construct(DiContainer container)
