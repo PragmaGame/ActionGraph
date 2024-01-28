@@ -13,7 +13,7 @@ namespace Game.Core.ActionGraph.Runtime
 
     public static class TransitionDataExtensions
     {
-        public static List<TransitionData> Clone(this List<TransitionData> data) => data
+        public static List<TransitionData> Clone(this List<TransitionData> transitionData) => transitionData
             .Select(data => new TransitionData { value = data.value, nodeKey = data.nodeKey }).ToList();
     }
 } 

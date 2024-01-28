@@ -37,8 +37,8 @@ namespace Game.Core.ActionGraph.Editor
             
             MetaData = metaData ?? "Enter Meta Data";
 
-            mainContainer.AddToClassList("ng-node__main-container");
-            extensionContainer.AddToClassList("ng-node__extension-container");
+            mainContainer.AddToClassList(StylesConstant.NodeConstant.MAIN_CONTAINER);
+            extensionContainer.AddToClassList(StylesConstant.NodeConstant.EXTENSION_CONTAINER);
 
             CreateElements();
         }
@@ -52,9 +52,9 @@ namespace Game.Core.ActionGraph.Editor
             
             keyTextField.RegisterValueChangedCallback(OnKeyFieldChange);
 
-            keyTextField.AddToClassList("ng-node__text-field");
-            keyTextField.AddToClassList("ng-node__filename-text-field");
-            keyTextField.AddToClassList("ng-node__text-field__hidden");
+            keyTextField.AddToClassList(StylesConstant.NodeConstant.NODE_TEXT_FIELD);
+            keyTextField.AddToClassList(StylesConstant.NodeConstant.NODE_FILENAME_TEXT_FIELD);
+            keyTextField.AddToClassList(StylesConstant.NodeConstant.NODE_TEXT_FIELD_HIDDEN);
             
             titleContainer.Insert(0, keyTextField);
 
@@ -63,7 +63,7 @@ namespace Game.Core.ActionGraph.Editor
                 text = "Add Transition"
             };
             
-            addTransitionButton.AddToClassList("ng-node__button");
+            addTransitionButton.AddToClassList(StylesConstant.NodeConstant.NODE_BUTTON);
             
             mainContainer.Insert(1, addTransitionButton);
 
@@ -82,8 +82,8 @@ namespace Game.Core.ActionGraph.Editor
                 multiline = true,
             };
             
-            metaDataTextField.AddToClassList("ng-node__text-field");
-            metaDataTextField.AddToClassList("ng-node__quote-text-field");
+            metaDataTextField.AddToClassList(StylesConstant.NodeConstant.NODE_TEXT_FIELD);
+            metaDataTextField.AddToClassList(StylesConstant.NodeConstant.QUOTE_TEXT_FIELD);
 
             
             // var a = Enum.GetNames(typeof(MetaDataTypes)).ToList();
@@ -121,16 +121,16 @@ namespace Game.Core.ActionGraph.Editor
                 transitionData.value = callback.newValue;
             });
                 
-            transitionTextField.AddToClassList("ng-node__text-field");
-            transitionTextField.AddToClassList("ng-node__transition-text-field");
-            transitionTextField.AddToClassList("ng-node__text-field__hidden");
+            transitionTextField.AddToClassList(StylesConstant.NodeConstant.NODE_TEXT_FIELD);
+            transitionTextField.AddToClassList(StylesConstant.NodeConstant.TRANSITION_TEXT_FIELD);
+            transitionTextField.AddToClassList(StylesConstant.NodeConstant.NODE_TEXT_FIELD_HIDDEN);
             
             var deleteTransitionButton = new Button(() => OnClickDeleteTransitionButton(transitionPort, transitionData))
             {
                 text = "X",
             };
                 
-            deleteTransitionButton.AddToClassList("ng-node__button");
+            deleteTransitionButton.AddToClassList(StylesConstant.NodeConstant.NODE_BUTTON);
 
             transitionPort.Add(transitionTextField);
             transitionPort.Add(deleteTransitionButton);

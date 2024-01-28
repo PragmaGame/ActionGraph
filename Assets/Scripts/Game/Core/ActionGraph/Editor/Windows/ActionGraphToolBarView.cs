@@ -7,7 +7,7 @@ namespace Game.Core.ActionGraph.Editor
 {
     public class ActionGraphToolBarView
     {
-        private Toolbar _toolbar;
+        private ActionGraphToolBarViewConfig _config;
 
         private TextField _fileNameTextField;
         
@@ -19,10 +19,14 @@ namespace Game.Core.ActionGraph.Editor
         public event Action<string> ClickLoadButtonEvent;
         public event Action<string> ChangeSearchFieldEvent;
         public event Action ClickMiniMapButtonEvent;
+        
+        public Toolbar Toolbar { get; private set; }
 
-        public Toolbar Initialize()
+        public ActionGraphToolBarView(ActionGraphToolBarViewConfig config)
         {
-            _toolbar = new Toolbar();
+            _config = config;
+            
+            Toolbar = new Toolbar();
 
             _fileNameTextField = new TextField()
             {
@@ -31,33 +35,30 @@ namespace Game.Core.ActionGraph.Editor
 
             _fileNameTextField.RegisterValueChangedCallback(OnChangeFileNameTextField);
             
-            _toolbar.Add(_fileNameTextField);
+            Toolbar.Add(_fileNameTextField);
 
             _saveButton = new Button(OnClickSaveButton)
             {
                 text = "Save",
             };
             
-            _toolbar.Add(_saveButton);
+            Toolbar.Add(_saveButton);
             
             _loadButton = new Button(OnClickLoadButton)
             {
                 text = "Load",
             };
             
-            _toolbar.Add(_loadButton);
+            Toolbar.Add(_loadButton);
             
             _miniMapButton = new Button(OnClickMiniMapButton)
             {
                 text = "Mini Map",
             };
             
-            _toolbar.Add(_miniMapButton);
-
-            var styleSheet = (StyleSheet)EditorGUIUtility.Load("NovelGraph/NovelGraphToolbarStyles.uss");
-            _toolbar.styleSheets.Add(styleSheet);
+            Toolbar.Add(_miniMapButton);
             
-            return _toolbar;
+            Toolbar.styleSheets.Add(_config.StyleSheet);
         }
 
         private void OnClickLoadButton()

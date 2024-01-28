@@ -18,20 +18,18 @@ namespace Game.Core.ActionGraph.Editor
 
         private KeyValidator _validator;
 
-        public ActionGraphView()
+        public ActionGraphView(ActionGraphViewConfig config)
         {
+            _config = config;
+            
             AddManipulators();
             AddGridBackground();
             AddMiniMap();
             AddStyles();
-
-            //SetElementsDeletedCallback();
-            SetGraphViewChangedCallback();
             
-            _config = (ActionGraphViewConfig)EditorGUIUtility.Load("NovelGraph/NovelGraphViewConfig.asset");
+            SetGraphViewChangedCallback();
 
             _keysMap = new Dictionary<string, List<ActionNode>>();
-
             _validator = new KeyValidator(_config.KeyValidatorParam);
         }
 
@@ -241,11 +239,10 @@ namespace Game.Core.ActionGraph.Editor
 
         private void AddStyles()
         {
-            var graphViewStyleSheet = (StyleSheet)EditorGUIUtility.Load("NovelGraph/NovelGraphViewStyles.uss");
-            var nodeStyleSheet = (StyleSheet)EditorGUIUtility.Load("NovelGraph/NovelNodeStyles.uss");
-            
-            styleSheets.Add(graphViewStyleSheet);
-            styleSheets.Add(nodeStyleSheet);
+            foreach (var styleSheet in _config.StyleSheet)
+            {
+                styleSheets.Add(styleSheet);
+            }
         }
 
         private void AddGridBackground()
@@ -326,54 +323,6 @@ namespace Game.Core.ActionGraph.Editor
 
             return _config.DefaultKeyNode;
         }
-        
-        // private void SetElementsDeletedCallback()
-        // {
-        //     deleteSelection = (_, _) =>
-        //     {
-        //         foreach (var selectable in selection)
-        //         {
-        //             if (selectable is not GraphNode graphNode)
-        //             {
-        //                 continue;
-        //             }
-        //             
-        //             graphNode.ChangeKeyFunc -= OnRevalidateKey;
-        //             graphNode.DeleteElementsRequestEvent -= OnDeleteElements;
-        //             RemoveKeyFromMap(graphNode);
-        //         }
-        //
-        //         DeleteSelection();
-        //         // var connections = new HashSet<Edge>();
-        //         //
-        //         // foreach (var selectable in selection)
-        //         // {
-        //         //     if (selectable is not GraphNode graphNode)
-        //         //     {
-        //         //         continue;
-        //         //     }
-        //         //     
-        //         //     graphNode.ChangeKeyFunc -= OnRevalidateKey;
-        //         //     graphNode.DeleteElementsRequestEvent -= OnDeleteElements;
-        //         //     RemoveKeyFromMap(graphNode);
-        //         //     
-        //         //     graphNode.Query<Port>().ForEach(port =>
-        //         //     {
-        //         //         if (!port.connected)
-        //         //         {
-        //         //             return;
-        //         //         }
-        //         //
-        //         //         connections.UnionWith(port.connections);
-        //         //     });
-        //         // }
-        //         //
-        //         // connections.Remove(null);
-        //         //
-        //         // DeleteElements(connections);
-        //         // DeleteElements(selection.OfType<GraphElement>());
-        //     };
-        // }
 
         private void SetGraphViewChangedCallback()
         {

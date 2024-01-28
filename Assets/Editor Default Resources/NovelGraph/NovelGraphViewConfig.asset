@@ -14,10 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <DefaultColor>k__BackingField: {r: 0.11372549, g: 0.11372549, b: 0.11764706, a: 1}
   <ErrorColor>k__BackingField: {r: 1, g: 0, b: 0.019788265, a: 1}
-  <DefaultKeyNode>k__BackingField: DefaultKey
+  <DefaultKeyNode>k__BackingField: default-key
   <KeyValidatorParam>k__BackingField:
     _patterns:
     - value1: \s+
       value2: '-'
     - value1: '[^a-z0-9\-]'
       value2: 
+  <StyleSheet>k__BackingField:
+  - {fileID: 7433441132597879392, guid: 66727be9b8c864a42b1d382a5a4ca589, type: 3}
+  - {fileID: 7433441132597879392, guid: 17410d76e2bca054db8042edb2502233, type: 3}

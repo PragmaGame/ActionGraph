@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Game.Core.ActionGraph.Editor
 {
@@ -10,6 +11,8 @@ namespace Game.Core.ActionGraph.Editor
 
         [field: SerializeField] public string DefaultKeyNode { get; private set; } = "default-key";
         [field: SerializeField] public KeyValidatorParam KeyValidatorParam { get; private set; }
+        
+        [field: SerializeField] public StyleSheet[] StyleSheet { get; private set; }
 
         private static Color ParseHtmlToColor(string colorString)
         {
