@@ -209,7 +209,8 @@ namespace Game.Core.ActionGraph.Editor
             {
                 if (node is ActionNode actionNode && actionNode.Key.Contains(nodeKey))
                 {
-                    UpdateViewTransform(contentViewContainer.ChangeCoordinatesTo(actionNode, viewport.contentRect.center - actionNode.contentRect.center), Vector3.one);
+                    UpdateViewTransform(contentViewContainer
+                        .ChangeCoordinatesTo(actionNode, viewport.contentRect.center - actionNode.contentRect.center), Vector3.one);
                 }
             }
         }

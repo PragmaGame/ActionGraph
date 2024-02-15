@@ -12,7 +12,7 @@ namespace Game.Core.Hub
     [Serializable]
     public class ProcessorHub
     {
-        [SerializeReference] private IProcessRunner _processRunner;
+        [SerializeReference] private IProcessRunner _processRunner = new ParallelProcessRunner();
         [SerializeReference] private List<IActionProcessor> _processors = new();
 
         [Inject]

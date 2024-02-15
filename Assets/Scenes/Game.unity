@@ -615,6 +615,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1096309901}
   - component: {fileID: 1096309900}
+  - component: {fileID: 1096309902}
   m_Layer: 0
   m_Name: SceneContext
   m_TagString: Untagged
@@ -668,6 +669,32 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1096309902
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1096309899}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2330f1742ac49f19c900b87f20cb6e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _installers:
+  - rid: 1788503346948603904
+  - rid: 1788503346948603905
+  references:
+    version: 2
+    RefIds:
+    - rid: 1788503346948603904
+      type: {class: ActionGraphInstaller, ns: ZenjectInstallers.Game, asm: Assembly-CSharp}
+      data:
+        _graphData: {fileID: 11400000, guid: 82c36f4dc5e144246add67191ba74483, type: 2}
+    - rid: 1788503346948603905
+      type: {class: LocalizationInstaller, ns: ZenjectInstallers.Game, asm: Assembly-CSharp}
+      data:
+        _config: {fileID: 11400000, guid: d264b03c8ff8abc49a7622c5ee78ff59, type: 2}
 --- !u!1 &1117505632
 GameObject:
   m_ObjectHideFlags: 0
@@ -714,10 +741,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _graphActions:
   - _key: t1
-    _processorHubs: []
+    _processorHubs:
+    - _processRunner:
+        rid: 1788503259566047233
+      _processors:
+      - rid: 1788503259566047234
   - _key: t3
-    _processorHubs: []
-  - _key: t21
     _processorHubs: []
   - _key: t22
     _processorHubs: []
@@ -730,7 +759,16 @@ MonoBehaviour:
   _groupKey: TestGroup1
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 1788503259566047233
+      type: {class: ParallelProcessRunner, ns: Game.Core.Hub.ProcessRunners, asm: Assembly-CSharp}
+      data: 
+    - rid: 1788503259566047234
+      type: {class: TextProcessor, ns: Game.Core.Hub.Processors, asm: Assembly-CSharp}
+      data:
+        _textKey: hello-1
+        _speakerName: 
+        _text: 
 --- !u!1 &1176618514
 GameObject:
   m_ObjectHideFlags: 0

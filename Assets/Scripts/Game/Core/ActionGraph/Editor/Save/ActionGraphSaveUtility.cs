@@ -19,6 +19,16 @@ namespace Game.Core.ActionGraph.Editor
             return true;
         }
         
+        public static string TryConvertFullPathToLocal(string path)
+        {
+            if (path.StartsWith(Application.dataPath)) 
+            {
+                path = "Assets" + path[Application.dataPath.Length..];
+            }
+
+            return path;
+        }
+        
         public static void Save(ActionGraphView graph, string path)
         {
             if (!IsValidPath(path, out var validPath))
@@ -40,8 +50,6 @@ namespace Game.Core.ActionGraph.Editor
                 return;
             }
             
-            graph.DeleteAll();
-
             var asset = AssetDatabase.LoadAssetAtPath<ActionGraphData>(validPath);
             
             graph.LoadSnapshotData(asset.GetSnapshotData());
@@ -67,16 +75,6 @@ namespace Game.Core.ActionGraph.Editor
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-        }
-
-        public static string TryConvertFullPathToLocal(string path)
-        {
-            if (path.StartsWith(Application.dataPath)) 
-            {
-                path = "Assets" + path[Application.dataPath.Length..];
-            }
-
-            return path;
         }
     }
 }

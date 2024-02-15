@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Common;
 using UnityEngine;
 
-namespace Game.Core.ActionGraph.Runtime
+namespace Game.Core.ActionGraph.Runtime.Obsolete
 {
     [CreateAssetMenu(fileName = nameof(NodeMetaDataParser), menuName = "Parsers/" + nameof(NodeMetaDataParser))]
     public partial class NodeMetaDataParser : ScriptableObject

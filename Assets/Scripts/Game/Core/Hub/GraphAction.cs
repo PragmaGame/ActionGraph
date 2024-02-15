@@ -13,13 +13,15 @@ namespace Game.Core.Hub
     [Serializable]
     public class GraphAction
     {
-        [SerializeField, ValueDropdown("@ActionGraphDataEditorHelper.GetNodesGraphsKeys()", NumberOfItemsBeforeEnablingSearch = 1)] 
-        private string _key;
+        [ValueDropdown("@ActionGraphDataEditorHelper.GetNodesGraphsKeys()", NumberOfItemsBeforeEnablingSearch = 1)] 
+        [SerializeField] private string _key;
         
         [SerializeField] private List<ProcessorHub> _processorHubs;
 
         private SequenceProcessRunner _runner;
         private CancellationTokenSource _cancellationTokenSource;
+
+        public string Key => _key;
         
         public GraphAction()
         {
@@ -40,8 +42,8 @@ namespace Game.Core.Hub
                 container.Inject(processorHub);
             }
         }
-
-        [Button(ButtonStyle.FoldoutButton)]
+        
+        [HideInEditorMode, Button(ButtonStyle.FoldoutButton)]
         public async void Run()
         {
             _cancellationTokenSource = new CancellationTokenSource();
@@ -52,7 +54,7 @@ namespace Game.Core.Hub
             }
         }
 
-        [Button(ButtonStyle.FoldoutButton)]
+        [HideInEditorMode, Button(ButtonStyle.FoldoutButton)]
         public void Stop()
         {
             _cancellationTokenSource?.Cancel();

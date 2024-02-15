@@ -77,6 +77,17 @@ namespace Common
             return value;
         }
 
+        public void Replace(Dictionary<TKey, TValue> dictionary)
+        {
+            data.Clear();
+            Clear();
+            
+            foreach (var tuple in dictionary)
+            {
+                Add(tuple.Key, tuple.Value);
+            }
+        }
+
         public abstract TClass Create(KeyValuePair<TKey, TValue> kvp);
     }
 }

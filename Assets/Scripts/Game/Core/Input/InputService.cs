@@ -1,7 +1,4 @@
-﻿using Game.Core.Input;
-using UnityEngine;
-
-namespace Game.Services.Input
+﻿namespace Game.Core.Input
 {
     public class InputService
     {

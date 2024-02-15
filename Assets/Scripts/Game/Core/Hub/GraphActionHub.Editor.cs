@@ -15,10 +15,11 @@ namespace Game.Core.Hub
 
         [SerializeField] private bool _isUseGroupKey;
         
-        [SerializeField, ShowIf("_isUseGroupKey"), ValueDropdown("@ActionGraphDataEditorHelper.GetGroupsKeys(_data)")] 
-        private string _groupKey;
+        [ShowIf("_isUseGroupKey")]
+        [ValueDropdown("@ActionGraphDataEditorHelper.GetGroupsKeys(_data)")] 
+        [SerializeField] private string _groupKey;
         
-        [Button]
+        [HideInPlayMode, Button]
         public void FillGraphActions()
         {
             _graphActions = new List<GraphAction>();

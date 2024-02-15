@@ -2,6 +2,7 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Game.Core.Dialogue;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using Zenject;
 
@@ -10,6 +11,9 @@ namespace Game.Core.Hub.Processors
     [Serializable]
     public class TextProcessor : ActionProcessor
     {
+        [ValueDropdown("@EditorLocalizationHelper.GetKeys()")]
+        [SerializeField] private string _textKey;
+        
         [SerializeField] private string _speakerName;
         [SerializeField] private string _text;
 

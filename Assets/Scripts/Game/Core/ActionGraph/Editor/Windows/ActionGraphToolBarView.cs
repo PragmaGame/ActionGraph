@@ -9,11 +9,14 @@ namespace Game.Core.ActionGraph.Editor
     {
         private ActionGraphToolBarViewConfig _config;
 
-        private TextField _fileNameTextField;
-        
+        private TextField _searchTextField;
+
+        private Button _updateButton;
         private Button _saveButton;
         private Button _loadButton;
         private Button _miniMapButton;
+
+        private string _lastOpenGraphPath;
 
         public event Action<string> ClickSaveButtonEvent;
         public event Action<string> ClickLoadButtonEvent;
@@ -28,15 +31,22 @@ namespace Game.Core.ActionGraph.Editor
             
             Toolbar = new Toolbar();
 
-            _fileNameTextField = new TextField()
+            _searchTextField = new TextField()
             {
                 label = "Search Node:",
             };
 
-            _fileNameTextField.RegisterValueChangedCallback(OnChangeFileNameTextField);
+            _searchTextField.RegisterValueChangedCallback(OnChangeSearchTextField);
             
-            Toolbar.Add(_fileNameTextField);
+            Toolbar.Add(_searchTextField);
 
+            _updateButton = new Button(OnClickUpdateButton)
+            {
+                text = "Update",
+            };
+            
+            Toolbar.Add(_updateButton);
+            
             _saveButton = new Button(OnClickSaveButton)
             {
                 text = "Save",
@@ -64,6 +74,8 @@ namespace Game.Core.ActionGraph.Editor
         private void OnClickLoadButton()
         {
             var filePath = EditorUtility.OpenFilePanel("Action Graphs", "Assets/", "asset");
+
+            _lastOpenGraphPath = filePath;
             
             ClickLoadButtonEvent?.Invoke(filePath);
         }
@@ -74,13 +86,18 @@ namespace Game.Core.ActionGraph.Editor
             
             ClickSaveButtonEvent?.Invoke(filePath);
         }
+        
+        private void OnClickUpdateButton()
+        {
+            ClickSaveButtonEvent?.Invoke(_lastOpenGraphPath);
+        }
 
         private void OnClickMiniMapButton()
         {
             ClickMiniMapButtonEvent?.Invoke();
         }
 
-        private void OnChangeFileNameTextField(ChangeEvent<string> callback)
+        private void OnChangeSearchTextField(ChangeEvent<string> callback)
         {
             ChangeSearchFieldEvent?.Invoke(callback.newValue);
         }

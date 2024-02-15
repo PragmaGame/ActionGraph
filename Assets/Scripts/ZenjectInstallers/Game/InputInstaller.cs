@@ -1,5 +1,5 @@
 ﻿using System;
-using Game.Services.Input;
+using Game.Core.Input;
 using Zenject;
 
 namespace ZenjectInstallers.Game

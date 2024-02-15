@@ -1,27 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
 
 namespace Game.Core.ActionGraph.Runtime
 {
-    public class ActionGraphReceiver : MonoBehaviour
+    public class ActionGraphReceiver
     {
-        [SerializeField] private ActionGraphData _actionGraphData;
-
+        private ActionGraphData _graphData;
         private Dictionary<string, NodeData> _graph;
         
         public event Action<NodeData> SwitchNodeEvent;
         
         public NodeData CurrentNode { get; private set; }
-        
-        private void Awake()
+
+        public ActionGraphReceiver(ActionGraphData data)
         {
+            _graphData = data;
+            
             _graph = new Dictionary<string, NodeData>();
 
-            foreach (var data in _actionGraphData.GetSnapshotData().nodes)
+            foreach (var nodeData in _graphData.GetSnapshotData().nodes)
             {
-                _graph.Add(data.key, data);
+                _graph.Add(nodeData.key, nodeData);
             }
         }
 
