@@ -3,7 +3,7 @@ using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 
-namespace Game.Core.Dialogue
+namespace Game.Core.Panels
 {
     public class DialoguePanel : MonoBehaviour
     {

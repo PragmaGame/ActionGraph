@@ -1,13 +1,12 @@
 ﻿#if UNITY_EDITOR
 
-using System.Collections.Generic;
 using Game.Core.ActionGraph.Runtime;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace Game.Core.Hub
 {
-    public partial class GraphActionHub
+    public partial class GraphActionBuilder
     {
         [Space(25)]
         [InfoBox("Editor Only")]
@@ -22,22 +21,22 @@ namespace Game.Core.Hub
         [HideInPlayMode, Button]
         public void FillGraphActions()
         {
-            _graphActions = new List<GraphAction>();
-
             if (_isUseGroupKey)
             {
                 var group = _data.GetSnapshotData().groups.Find(x => x.key == _groupKey);
             
                 foreach (var key in group.ownedNodesKeys)
                 {
-                    _graphActions.Add(new GraphAction(key));
+                    var graphAction = gameObject.AddComponent<GraphAction>();
+                    graphAction.SetKey(key);
                 }
             }
             else
             {
                 foreach (var nodeData in _data.GetSnapshotData().nodes)
                 {
-                    _graphActions.Add(new GraphAction(nodeData.key));
+                    var graphAction = gameObject.AddComponent<GraphAction>();
+                    graphAction.SetKey(nodeData.key);
                 }
             }
         }

@@ -23,6 +23,11 @@ namespace Game.Core.ActionGraph.Runtime
         {
             _graphSnapshotData = graphSnapshotData;
         }
+
+        public GraphSnapshotData GetOriginalData()
+        {
+            return _graphSnapshotData;
+        }
 #endif
     }
 }

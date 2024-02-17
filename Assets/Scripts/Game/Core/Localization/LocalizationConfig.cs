@@ -22,14 +22,14 @@ namespace Game.Core.Localization
         {
             var languageIndex = _languages.FindIndex(matchLanguage => matchLanguage.Contains(language));
 
-            if (languageIndex == -1)
+            if (languageIndex != -1)
             {
                 map = _localizations.ToDictionary(pair => pair.Key, pair => pair.Value[languageIndex]);
-                return false;
+                return true;
             }
 
             map = null;
-            return true;
+            return false;
         }
 
         public Dictionary<string, string> GetDefaultLocalization()

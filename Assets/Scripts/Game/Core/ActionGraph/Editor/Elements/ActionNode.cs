@@ -12,7 +12,7 @@ namespace Game.Core.ActionGraph.Editor
         public string Key { get; private set; }
         public List<TransitionData> Transitions { get; set; }
         public string MetaData { get; set; }
-        
+
         public event Action<List<GraphElement>> DeleteElementsRequestEvent;
         public event Func<ActionNode, string, string, string> ChangeKeyFunc; 
 
@@ -85,7 +85,6 @@ namespace Game.Core.ActionGraph.Editor
             metaDataTextField.AddToClassList(StylesConstant.NodeConstant.NODE_TEXT_FIELD);
             metaDataTextField.AddToClassList(StylesConstant.NodeConstant.QUOTE_TEXT_FIELD);
 
-            
             // var a = Enum.GetNames(typeof(MetaDataTypes)).ToList();
             // var metaDataDropdown = new DropdownField(a, 0);
 

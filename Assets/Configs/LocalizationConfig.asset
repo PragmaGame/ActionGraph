@@ -14,15 +14,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _localizations:
     data:
-    - key: hello-1
+    - key: hello
       val:
       - hello
       - "\u043F\u0440\u0438\u0432\u0435\u0442"
+    - key: how-are-you
+      val:
+      - how are you?
+      - "\u043A\u0430\u043A \u0434\u0435\u043B\u0430?"
+    - key: fine
+      val:
+      - fine
+      - "\u0445\u043E\u0440\u043E\u0448\u043E"
   _languages:
   - English
   - Russian
   _keys:
-  - hello-1
+  - hello
+  - how-are-you
+  - fine
   _defaultLanguage: English
-  _csv: {fileID: 4900000, guid: 4ea3d9f2ce0a51b4ab3a3588d9f9a497, type: 3}
+  _csv: {fileID: 4900000, guid: 8f09e889e284dce43af2ef9a301203a1, type: 3}
   _rootTable: Key

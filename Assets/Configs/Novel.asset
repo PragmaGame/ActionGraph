@@ -15,59 +15,44 @@ MonoBehaviour:
   <Id>k__BackingField: 
   _graphSnapshotData:
     groups:
-    - key: TestGroup1
+    - key: FirstGroup
       ownedNodesKeys:
-      - t1
-      - t3
-      - t21
-      - t22
-      position: {x: 449, y: 97}
-    - key: TestGroup2
-      ownedNodesKeys:
-      - t5
-      position: {x: 2475, y: 186}
+      - hello
+      - how-are-you
+      - fine
+      - how-are-you1
+      - fine2
+      position: {x: 239, y: 288}
     nodes:
-    - key: t1
+    - key: hello
+      metaData: Enter Meta Data
+      transitions:
+      - value: first-t
+        nodeKey: how-are-you
+      - value: second-t
+        nodeKey: how-are-you1
+      position: {x: 264, y: 347}
+    - key: how-are-you
       metaData: Enter Meta Data
       transitions:
       - value: transition
-        nodeKey: t21
-      - value: transition
-        nodeKey: t22
-      position: {x: 474, y: 249}
-    - key: t3
+        nodeKey: fine
+      position: {x: 654, y: 347}
+    - key: fine
       metaData: Enter Meta Data
       transitions:
       - value: transition
-        nodeKey: t4
-      position: {x: 1320, y: 249}
-    - key: t21
+        nodeKey: fine2
+      position: {x: 1065, y: 347}
+    - key: how-are-you1
       metaData: Enter Meta Data
       transitions:
       - value: transition
-        nodeKey: t3
-      position: {x: 891, y: 156}
-    - key: t22
-      metaData: Enter Meta Data
-      transitions:
-      - value: transition
-        nodeKey: t3
-      position: {x: 891, y: 413}
-    - key: t4
-      metaData: Enter Meta Data
-      transitions:
-      - value: transition
-        nodeKey: t5
-      position: {x: 1939, y: 217}
-    - key: t5
+        nodeKey: fine
+      position: {x: 654, y: 567}
+    - key: fine2
       metaData: Enter Meta Data
       transitions:
       - value: transition
         nodeKey: 
-      position: {x: 2500, y: 245}
-    - key: default-key
-      metaData: Enter Meta Data
-      transitions:
-      - value: transition
-        nodeKey: 
-      position: {x: 1939, y: 523}
+      position: {x: 1374, y: 347}

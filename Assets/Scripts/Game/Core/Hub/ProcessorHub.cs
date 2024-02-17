@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Game.Core.ActionGraph.Runtime;
 using Game.Core.Hub.Processors;
 using Game.Core.Hub.ProcessRunners;
 using UnityEngine;
@@ -24,9 +25,9 @@ namespace Game.Core.Hub
             }
         }
 
-        public UniTask RunProcess(CancellationToken token)
+        public UniTask RunProcess(NodeData data, CancellationToken token)
         {
-            return _processRunner.RunProcess(_processors.Select(x => x.RunProcess(token)));
+            return _processRunner.RunProcess(_processors.Select(x => x.RunProcess(data, token)));
         }
     }
 }
