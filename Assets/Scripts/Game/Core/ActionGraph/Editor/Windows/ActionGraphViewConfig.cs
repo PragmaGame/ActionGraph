@@ -13,6 +13,8 @@ namespace Game.Core.ActionGraph.Editor
         [field: SerializeField] public KeyValidatorParam KeyValidatorParam { get; private set; }
         
         [field: SerializeField] public StyleSheet[] StyleSheet { get; private set; }
+        
+        [field: SerializeField] public string DefaultNodePath{ get; private set; }
 
         private static Color ParseHtmlToColor(string colorString)
         {

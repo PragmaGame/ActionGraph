@@ -11,6 +11,7 @@ namespace Game.Core.ActionGraph.Editor
     public class ActionGraphView : GraphView
     {
         private ActionGraphViewConfig _config;
+        private ActionGraphData _actionGraphData;
         
         private MiniMap _miniMap;
 
@@ -78,15 +79,15 @@ namespace Game.Core.ActionGraph.Editor
             return contextualMenuManipulator;
         }
         
-        public void LoadSnapshotData(GraphSnapshotData graphSnapshotData)
+        public void LoadData(ActionGraphData graphData)
         {
-            DeleteAll();
+            _actionGraphData = graphData;
             
             var actionNodes = new Dictionary<string, ActionNode>();
 
-            foreach (var nodeData in graphSnapshotData.nodes)
+            foreach (var nodeData in graphData.Nodes)
             {
-                var node = CreateNode(nodeData.position, nodeData.key, nodeData.transitions, nodeData.metaData);
+                var node = CreateNode(data: nodeData);
                 
                 actionNodes.Add(node.Key, node);
             }
@@ -114,7 +115,7 @@ namespace Game.Core.ActionGraph.Editor
                 }
             }
 
-            foreach (var groupData in graphSnapshotData.groups)
+            foreach (var groupData in graphData.Groups)
             {
                 var group = CreateGroup(groupData.position, groupData.key);
 
@@ -125,46 +126,40 @@ namespace Game.Core.ActionGraph.Editor
             }
         }
 
-        public GraphSnapshotData SnapshotGraph()
-        {
-            var graphSnapshotData = new GraphSnapshotData();
-
-            foreach (var element in graphElements)
-            {
-                if (element is ActionNode node)
-                {
-                    graphSnapshotData.nodes.Add(new NodeData()
-                    {
-                        key = node.Key,
-                        metaData = node.MetaData,
-                        transitions = node.Transitions.Select(transition => transition.Clone()).ToList(),
-                        position = node.GetPosition().position
-                    });
-                }
-
-                if (element is Group group)
-                {
-                    var groupData = new GroupData()
-                    {
-                        key = group.title,
-                        position = group.GetPosition().position,
-                        ownedNodesKeys = new List<string>()
-                    };
-                    
-                    graphSnapshotData.groups.Add(groupData);
-
-                    foreach (var groupElement in group.containedElements)
-                    {
-                        if (groupElement is ActionNode ownGroupNode)
-                        {
-                            groupData.ownedNodesKeys.Add(ownGroupNode.Key);
-                        }
-                    }
-                }
-            }
-
-            return graphSnapshotData;
-        }
+        // public GraphSnapshotData SnapshotGraph()
+        // {
+        //     var graphSnapshotData = new GraphSnapshotData();
+        //
+        //     foreach (var element in graphElements)
+        //     {
+        //         if (element is ActionNode node)
+        //         {
+        //             graphSnapshotData.nodes.Add(node.Data);
+        //         }
+        //
+        //         if (element is Group group)
+        //         {
+        //             var groupData = new GroupData()
+        //             {
+        //                 key = group.title,
+        //                 position = group.GetPosition().position,
+        //                 ownedNodesKeys = new List<string>()
+        //             };
+        //             
+        //             graphSnapshotData.groups.Add(groupData);
+        //
+        //             foreach (var groupElement in group.containedElements)
+        //             {
+        //                 if (groupElement is ActionNode ownGroupNode)
+        //                 {
+        //                     groupData.ownedNodesKeys.Add(ownGroupNode.Key);
+        //                 }
+        //             }
+        //         }
+        //     }
+        //
+        //     return graphSnapshotData;
+        // }
 
         private Group CreateGroup(Vector2 position, string groupName = "DefaultGroupName")
         {
@@ -188,11 +183,27 @@ namespace Game.Core.ActionGraph.Editor
             return group;
         }
         
-        private ActionNode CreateNode(Vector2 position, string key = null, List<TransitionData> transitionsDates = null, string metaData = null)
+        private ActionNode CreateNode(Vector2 position = default, ActionNodeData data = null)
         {
-            key ??= _config.DefaultKeyNode;
-            
-            var node = new ActionNode(key, transitionsDates, metaData);
+            if (data == null)
+            {
+                data = ScriptableObject.CreateInstance<ActionNodeData>();
+                data.name = _config.DefaultKeyNode;
+                data.Key = _config.DefaultKeyNode;
+                data.Position = position;
+                
+                _actionGraphData.Nodes.Add(data);
+                
+                AssetDatabase.AddObjectToAsset(data, _actionGraphData);
+                
+                AssetDatabase.SaveAssetIfDirty(_actionGraphData);
+            }
+            else
+            {
+                position = data.Position;
+            }
+
+            var node = new ActionNode(data);
 
             AddElement(node);
             
@@ -356,7 +367,9 @@ namespace Game.Core.ActionGraph.Editor
                             {
                                 actionNode.ChangeKeyFunc -= OnRevalidateKey;
                                 actionNode.DeleteElementsRequestEvent -= OnDeleteElements;
+                                AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(actionNode.Data));
                                 RemoveKeyFromMap(actionNode);
+                                _actionGraphData.Nodes.Remove(actionNode.Data);
                                 break;
                             }
                         }

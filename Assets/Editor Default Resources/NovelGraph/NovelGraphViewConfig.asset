@@ -24,3 +24,4 @@ MonoBehaviour:
   <StyleSheet>k__BackingField:
   - {fileID: 7433441132597879392, guid: 66727be9b8c864a42b1d382a5a4ca589, type: 3}
   - {fileID: 7433441132597879392, guid: 17410d76e2bca054db8042edb2502233, type: 3}
+  <DefaultNodePath>k__BackingField: Assets/Configs/NovelNodeDates/

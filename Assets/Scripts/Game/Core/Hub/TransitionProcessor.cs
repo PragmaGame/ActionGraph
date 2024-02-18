@@ -28,7 +28,7 @@ namespace Game.Core.Hub
             _localizationService = localizationService;
         }
         
-        public async UniTask<int> SelectTransition(NodeData data)
+        public async UniTask<int> SelectTransition()
         {
             var result = await _transitionPanel.WaitSelection(_transitionParams);
 

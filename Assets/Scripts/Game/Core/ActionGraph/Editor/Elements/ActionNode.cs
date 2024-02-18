@@ -1,46 +1,48 @@
 ﻿using System;
 using System.Collections.Generic;
 using Game.Core.ActionGraph.Runtime;
+using Unity.VisualScripting;
+using UnityEditor;
 using UnityEditor.Experimental.GraphView;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 namespace Game.Core.ActionGraph.Editor
 {
     public class ActionNode : Node
     {
-        public string Key { get; private set; }
-        public List<TransitionData> Transitions { get; set; }
-        public string MetaData { get; set; }
+        public ActionNodeData Data { get; private set; }
 
         public event Action<List<GraphElement>> DeleteElementsRequestEvent;
         public event Func<ActionNode, string, string, string> ChangeKeyFunc; 
 
         private Port _inputPort;
 
-        public ActionNode(string key, List<TransitionData> transitionsDates = null, string metaData = null)
-        {
-            Key = key;
-            Transitions = new List<TransitionData>();
+        public string Key => Data.Key;
 
-            if (transitionsDates == null)
-            {
-                CreateTransitionPort();
-            }
-            else
-            {
-                foreach (var transitionData in transitionsDates)
-                {
-                    CreateTransitionPort(transitionData);
-                }
-            }
-            
-            MetaData = metaData ?? "Enter Meta Data";
+        public ActionNode(ActionNodeData data)
+        {
+            Data = data;
 
             mainContainer.AddToClassList(StylesConstant.NodeConstant.MAIN_CONTAINER);
             extensionContainer.AddToClassList(StylesConstant.NodeConstant.EXTENSION_CONTAINER);
 
             CreateElements();
+        }
+
+        public override void OnSelected()
+        {
+            base.OnSelected();
+            
+            Selection.SetActiveObjectWithContext(Data, Data);
+        }
+
+        public override void UpdatePresenterPosition()
+        {
+            Data.Position = GetPosition().position;
+            EditorUtility.SetDirty(Data);
         }
 
         private void CreateElements()
@@ -55,8 +57,9 @@ namespace Game.Core.ActionGraph.Editor
             keyTextField.AddToClassList(StylesConstant.NodeConstant.NODE_TEXT_FIELD);
             keyTextField.AddToClassList(StylesConstant.NodeConstant.NODE_FILENAME_TEXT_FIELD);
             keyTextField.AddToClassList(StylesConstant.NodeConstant.NODE_TEXT_FIELD_HIDDEN);
-            
-            titleContainer.Insert(0, keyTextField);
+
+            titleContainer.Clear();
+            titleContainer.Add(keyTextField);
 
             var addTransitionButton = new Button(OnClickAddTransitionButton)
             {
@@ -70,73 +73,53 @@ namespace Game.Core.ActionGraph.Editor
             _inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(bool));
             _inputPort.portName = "Input";
             inputContainer.Add(_inputPort);
-
-            var foldout = new Foldout()
-            {
-                text = "MetaData"
-            };
-
-            var metaDataTextField = new TextField()
-            {
-                value = MetaData,
-                multiline = true,
-            };
             
-            metaDataTextField.AddToClassList(StylesConstant.NodeConstant.NODE_TEXT_FIELD);
-            metaDataTextField.AddToClassList(StylesConstant.NodeConstant.QUOTE_TEXT_FIELD);
+            CreateTransitions();
 
-            // var a = Enum.GetNames(typeof(MetaDataTypes)).ToList();
-            // var metaDataDropdown = new DropdownField(a, 0);
-
-            foldout.Add(metaDataTextField);
-            //foldout.Add(metaDataDropdown);
-
-            extensionContainer.Add(foldout);
-            
             RefreshExpandedState();
         }
 
         private void OnClickAddTransitionButton() => CreateTransitionPort();
 
-        private void CreateTransitionPort(TransitionData transitionData = null)
+        private void CreateTransitions()
         {
-            transitionData ??= new TransitionData()
+            if (Data.Transitions == null || Data.Transitions.Count < 1)
             {
-                value = "transition",
-            };
-            
+                CreateTransitionPort();
+            }
+            else
+            {
+                foreach (var transitionData in Data.Transitions)
+                {
+                    CreateTransitionPort(transitionData);
+                }
+            }
+        }
+        
+        private void CreateTransitionPort(TransitionData transition = null)
+        {
+            if (transition == null)
+            {
+                transition = new TransitionData();
+                Data.Transitions.Add(transition);
+                EditorUtility.SetDirty(Data);
+            }
+
             var transitionPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single, typeof(bool));
             transitionPort.portName = string.Empty;
 
-            transitionPort.userData = transitionData;
+            transitionPort.userData = transition;
 
-            var transitionTextField = new TextField()
-            {
-                value = transitionData.value,
-            };
-
-            transitionTextField.RegisterValueChangedCallback(callback =>
-            {
-                transitionData.value = callback.newValue;
-            });
-                
-            transitionTextField.AddToClassList(StylesConstant.NodeConstant.NODE_TEXT_FIELD);
-            transitionTextField.AddToClassList(StylesConstant.NodeConstant.TRANSITION_TEXT_FIELD);
-            transitionTextField.AddToClassList(StylesConstant.NodeConstant.NODE_TEXT_FIELD_HIDDEN);
-            
-            var deleteTransitionButton = new Button(() => OnClickDeleteTransitionButton(transitionPort, transitionData))
+            var deleteTransitionButton = new Button(() => OnClickDeleteTransitionButton(transitionPort, transition))
             {
                 text = "X",
             };
                 
             deleteTransitionButton.AddToClassList(StylesConstant.NodeConstant.NODE_BUTTON);
-
-            transitionPort.Add(transitionTextField);
+            
             transitionPort.Add(deleteTransitionButton);
                 
             outputContainer.Add(transitionPort);
-            
-            Transitions.Add(transitionData);
         }
 
         public void SetBackgroundColor(Color color)
@@ -146,7 +129,7 @@ namespace Game.Core.ActionGraph.Editor
 
         private void OnClickDeleteTransitionButton(Port port, TransitionData transitionData)
         {
-            if (Transitions.Count == 1)
+            if (Data.Transitions.Count == 1)
             {
                 return;
             }
@@ -162,13 +145,17 @@ namespace Game.Core.ActionGraph.Editor
             
             DeleteElementsRequestEvent?.Invoke(elements);
             
-            Transitions.Remove(transitionData);
+            Data.Transitions.Remove(transitionData);
+            EditorUtility.SetDirty(Data);
         }
 
         private void OnKeyFieldChange(ChangeEvent<string> value)
         {
-            Key = ChangeKeyFunc?.Invoke(this, value.previousValue, value.newValue);
+            Data.Key = ChangeKeyFunc.Invoke(this, value.previousValue, value.newValue);
+            Data.name = Data.Key;
             
+            EditorUtility.SetDirty(Data);
+
             (value.target as TextField)?.SetValueWithoutNotify(Key);
 
             foreach (var edge in _inputPort.connections)

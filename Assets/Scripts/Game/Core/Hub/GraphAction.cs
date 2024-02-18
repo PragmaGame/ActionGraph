@@ -59,13 +59,13 @@ namespace Game.Core.Hub
         [HideInEditorMode, Button(ButtonStyle.FoldoutButton)]
         public async void Run()
         {
-            var data = _actionGraphReceiver.CurrentNode;
+            var data = _actionGraphReceiver.CurrentActionNodeData;
             
             _cancellationTokenSource = new CancellationTokenSource();
 
-            await _runner.RunProcess(_processorHubs.Select(x => x.RunProcess(data, _cancellationTokenSource.Token))).SuppressCancellationThrow();
+            await _runner.RunProcess(_processorHubs.Select(x => x.RunProcess(_cancellationTokenSource.Token))).SuppressCancellationThrow();
 
-            var transition = await _transitionProcessor.SelectTransition(data);
+            var transition = await _transitionProcessor.SelectTransition();
             
             _actionGraphReceiver.SwitchToNextNode(transition);
         }

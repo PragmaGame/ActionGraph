@@ -1,33 +1,16 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using Sirenix.OdinInspector;
+using UnityEngine;
 
 namespace Game.Core.ActionGraph.Runtime
 {
+    [CreateAssetMenu(fileName = nameof(ActionGraphData), menuName = "ActionGraph/" + nameof(ActionGraphData))]
     public class ActionGraphData : ScriptableObject
     {
-        [field: SerializeField] public string Id { get; private set;}
-        
-        [SerializeField] private GraphSnapshotData _graphSnapshotData;
+        [ReadOnly, SerializeField] private List<GroupData> _groups;
+        [ReadOnly, SerializeField] private List<ActionNodeData> _nodes;
 
-        public void Reset()
-        {
-            Id = name;
-        }
-        
-        public GraphSnapshotData GetSnapshotData()
-        {
-            return _graphSnapshotData.Clone();
-        }
-
-#if UNITY_EDITOR
-        public void SetSnapshotData(GraphSnapshotData graphSnapshotData)
-        {
-            _graphSnapshotData = graphSnapshotData;
-        }
-
-        public GraphSnapshotData GetOriginalData()
-        {
-            return _graphSnapshotData;
-        }
-#endif
+        public List<ActionNodeData> Nodes => _nodes;
+        public List<GroupData> Groups => _groups;
     }
 }

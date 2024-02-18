@@ -1,4 +1,6 @@
-﻿using UnityEditor;
+﻿using Game.Core.ActionGraph.Runtime;
+using UnityEditor;
+using UnityEditor.Callbacks;
 using UnityEngine.UIElements;
 
 namespace Game.Core.ActionGraph.Editor
@@ -9,11 +11,24 @@ namespace Game.Core.ActionGraph.Editor
         
         private ActionGraphView _actionGraphView;
         private ActionGraphToolBarView _actionGraphToolBarView;
-
-        [MenuItem("Graph/Action Graph")]
-        public static void Open()
+        
+        [OnOpenAsset(1)]
+        public static bool Open(int instanceID)
         {
-            GetWindow<ActionGraphEditorWindow>("Action Graph");
+            UnityEngine.Object asset = EditorUtility.InstanceIDToObject(instanceID);
+
+            if (asset is ActionGraphData data)
+            {
+                var window = GetWindow<ActionGraphEditorWindow>("Action Graph");
+                window.Load(data);
+            }
+
+            return false;
+        }
+
+        public void Load(ActionGraphData data)
+        {
+            _actionGraphView.LoadData(data);
         }
 
         private void OnEnable()
@@ -53,12 +68,12 @@ namespace Game.Core.ActionGraph.Editor
 
         private void OnClickSaveButton(string filePath)
         {
-            ActionGraphSaveUtility.Save(_actionGraphView, filePath);
+            //ActionGraphSaveUtility.Save(_actionGraphView, filePath);
         }
 
         private void OnClickLoadButton(string filePath)
         {
-            ActionGraphSaveUtility.Load(_actionGraphView, filePath);
+            //ActionGraphSaveUtility.Load(_actionGraphView, filePath);
         }
         
         private void OnClickMiniMapButton()

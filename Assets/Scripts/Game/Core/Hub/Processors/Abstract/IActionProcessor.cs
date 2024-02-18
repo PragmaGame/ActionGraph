@@ -6,6 +6,6 @@ namespace Game.Core.Hub.Processors
 {
     public interface IActionProcessor
     {
-        public UniTask RunProcess(NodeData data, CancellationToken token = default);
+        public UniTask RunProcess(CancellationToken token = default);
     }
 }

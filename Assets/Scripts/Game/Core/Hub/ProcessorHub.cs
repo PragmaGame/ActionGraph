@@ -25,9 +25,9 @@ namespace Game.Core.Hub
             }
         }
 
-        public UniTask RunProcess(NodeData data, CancellationToken token)
+        public UniTask RunProcess(CancellationToken token)
         {
-            return _processRunner.RunProcess(_processors.Select(x => x.RunProcess(data, token)));
+            return _processRunner.RunProcess(_processors.Select(x => x.RunProcess(token)));
         }
     }
 }

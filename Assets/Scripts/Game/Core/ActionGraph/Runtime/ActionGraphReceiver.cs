@@ -6,24 +6,24 @@ namespace Game.Core.ActionGraph.Runtime
     public class ActionGraphReceiver
     {
         private ActionGraphData _graphData;
-        private Dictionary<string, NodeData> _graph;
+        private Dictionary<string, ActionNodeData> _graph;
 
         private Dictionary<string, Action> _actionMap;
 
-        public event Action<NodeData> SwitchNodeEvent;
+        public event Action<ActionNodeData> SwitchNodeEvent;
         
-        public NodeData CurrentNode { get; private set; }
+        public ActionNodeData CurrentActionNodeData { get; private set; }
 
         public ActionGraphReceiver(ActionGraphData data)
         {
             _graphData = data;
             
-            _graph = new Dictionary<string, NodeData>();
+            _graph = new Dictionary<string, ActionNodeData>();
             _actionMap = new Dictionary<string, Action>();
 
-            foreach (var nodeData in _graphData.GetSnapshotData().nodes)
+            foreach (var nodeData in _graphData.Nodes)
             {
-                _graph.Add(nodeData.key, nodeData);
+                _graph.Add(nodeData.Key, nodeData);
             }
         }
 
@@ -34,21 +34,16 @@ namespace Game.Core.ActionGraph.Runtime
                 return;
             }
             
-            CurrentNode = _graph[nodeId];
+            CurrentActionNodeData = _graph[nodeId];
             
-            SwitchNodeEvent?.Invoke(CurrentNode);
+            SwitchNodeEvent?.Invoke(CurrentActionNodeData);
             
             InvokeSwitchConcreteNode(nodeId);
         }
 
-        public void SwitchToNextNode(string transitionId)
-        {
-            SwitchToNode(CurrentNode.transitions.Find(data => data.value == transitionId).nodeKey);
-        }
-        
         public void SwitchToNextNode(int transitionIndex = 0)
         {
-            SwitchToNode(CurrentNode.transitions[transitionIndex].nodeKey);
+            SwitchToNode(CurrentActionNodeData.Transitions[transitionIndex].nodeKey);
         }
 
         public void SubscribeToSwitchConcreteNode(string nodeKey, Action action)

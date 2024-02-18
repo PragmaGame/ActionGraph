@@ -28,7 +28,7 @@ namespace Game.Core.Hub.Processors
             _localizationService = localizationService;
         }
         
-        public override async UniTask RunProcess(NodeData data, CancellationToken token = default)
+        public override async UniTask RunProcess(CancellationToken token = default)
         {
             await _dialoguePanel.ShowText(_speakerName, _localizationService.GetString(_textKey));
         }

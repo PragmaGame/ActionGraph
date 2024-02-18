@@ -9,20 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 14aad36a24dd4ab8aaa49571e0ce68ea, type: 3}
-  m_Name: NodeMetaDataParser
+  m_Script: {fileID: 11500000, guid: b0be1907775c4eb0ae94a15c53c39a61, type: 3}
+  m_Name: ActionGraphData
   m_EditorClassIdentifier: 
-  _keyPrefix: //
-  _keysMap:
-    data:
-    - key: transition
-      val: 1
-    - key: other
-      val: 2
-  _debug: '//transition
-
-    value1
-
-    value2
-
-    //other'
+  _groups: []
+  _nodes: []
