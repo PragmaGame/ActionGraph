@@ -1,6 +1,8 @@
-﻿using Game.Core.ActionGraph.Runtime;
+﻿using System;
+using Game.Core.ActionGraph.Runtime;
 using UnityEditor;
 using UnityEditor.Callbacks;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Game.Core.ActionGraph.Editor
@@ -11,11 +13,16 @@ namespace Game.Core.ActionGraph.Editor
         
         private ActionGraphView _actionGraphView;
         private ActionGraphToolBarView _actionGraphToolBarView;
-        
+
         [OnOpenAsset(1)]
         public static bool Open(int instanceID)
         {
             UnityEngine.Object asset = EditorUtility.InstanceIDToObject(instanceID);
+
+            if (HasOpenInstances<ActionGraphEditorWindow>())
+            {
+                return true;
+            }
 
             if (asset is ActionGraphData data)
             {
@@ -23,14 +30,14 @@ namespace Game.Core.ActionGraph.Editor
                 window.Load(data);
             }
 
-            return false;
+            return true;
         }
 
         public void Load(ActionGraphData data)
         {
             _actionGraphView.LoadData(data);
         }
-
+        
         private void OnEnable()
         {
             _config = (ActionGraphEditorConfig)EditorGUIUtility.Load("NovelGraph/ActionGraphEditorConfig.asset");
@@ -38,6 +45,11 @@ namespace Game.Core.ActionGraph.Editor
             AddGraphView();
             AddToolBar();
             AddStyles();
+        }
+
+        private void OnDisable()
+        {
+            _actionGraphView.Save();
         }
 
         private void AddStyles()
@@ -69,6 +81,7 @@ namespace Game.Core.ActionGraph.Editor
         private void OnClickSaveButton(string filePath)
         {
             //ActionGraphSaveUtility.Save(_actionGraphView, filePath);
+            _actionGraphView.Save();
         }
 
         private void OnClickLoadButton(string filePath)

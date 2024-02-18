@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Sirenix.OdinInspector;
 
 namespace Game.Core.ActionGraph.Runtime
 {
@@ -21,10 +22,10 @@ namespace Game.Core.ActionGraph.Runtime
             _graph = new Dictionary<string, ActionNodeData>();
             _actionMap = new Dictionary<string, Action>();
 
-            foreach (var nodeData in _graphData.Nodes)
-            {
-                _graph.Add(nodeData.Key, nodeData);
-            }
+            // foreach (var nodeData in _graphData.Nodes)
+            // {
+            //     _graph.Add(nodeData.Key, nodeData);
+            // }
         }
 
         public void SwitchToNode(string nodeId)

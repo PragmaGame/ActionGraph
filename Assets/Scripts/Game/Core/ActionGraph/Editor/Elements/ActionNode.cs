@@ -39,10 +39,15 @@ namespace Game.Core.ActionGraph.Editor
             Selection.SetActiveObjectWithContext(Data, Data);
         }
 
+        public void AddKeyPostfix(string value)
+        {
+            Data.Key += value;
+            Data.name = Data.Key;
+        }
+
         public override void UpdatePresenterPosition()
         {
             Data.Position = GetPosition().position;
-            EditorUtility.SetDirty(Data);
         }
 
         private void CreateElements()
@@ -102,7 +107,6 @@ namespace Game.Core.ActionGraph.Editor
             {
                 transition = new TransitionData();
                 Data.Transitions.Add(transition);
-                EditorUtility.SetDirty(Data);
             }
 
             var transitionPort = InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single, typeof(bool));
@@ -146,15 +150,12 @@ namespace Game.Core.ActionGraph.Editor
             DeleteElementsRequestEvent?.Invoke(elements);
             
             Data.Transitions.Remove(transitionData);
-            EditorUtility.SetDirty(Data);
         }
 
         private void OnKeyFieldChange(ChangeEvent<string> value)
         {
             Data.Key = ChangeKeyFunc.Invoke(this, value.previousValue, value.newValue);
             Data.name = Data.Key;
-            
-            EditorUtility.SetDirty(Data);
 
             (value.target as TextField)?.SetValueWithoutNotify(Key);
 

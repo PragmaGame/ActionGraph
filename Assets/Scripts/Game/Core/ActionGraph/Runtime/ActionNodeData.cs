@@ -9,7 +9,9 @@ namespace Game.Core.ActionGraph.Runtime
     {
         [field: SerializeField,ReadOnly] public string Key { get; set; }
         [field: SerializeField,ReadOnly] public Vector2 Position {get; set; }
-        [field: SerializeField,ListDrawerSettings(IsReadOnly = true)] public List<TransitionData> Transitions { get; set; }
+
+        [field: SerializeField, ListDrawerSettings(IsReadOnly = true)]
+        public List<TransitionData> Transitions { get; set; } = new();
 
         [Space]
         [Header("Processors")]
@@ -17,10 +19,5 @@ namespace Game.Core.ActionGraph.Runtime
         [SerializeField] private TransitionProcessor _transitionProcessor;
 
         public IReadOnlyList<ProcessorHub> ProcessorHubs => _processorHubs;
-
-        private void Awake()
-        {
-            Transitions = new List<TransitionData>();
-        }
     }
 }

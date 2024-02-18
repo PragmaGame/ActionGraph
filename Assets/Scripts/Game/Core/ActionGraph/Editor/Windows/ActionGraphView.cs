@@ -11,11 +11,14 @@ namespace Game.Core.ActionGraph.Editor
     public class ActionGraphView : GraphView
     {
         private ActionGraphViewConfig _config;
-        private ActionGraphData _actionGraphData;
+        private ActionGraphData _rootData;
         
         private MiniMap _miniMap;
 
         private Dictionary<string, List<ActionNode>> _keysMap;
+
+        private List<ActionNodeData> _nodesToRemove;
+        private List<ActionNodeData> _nodesToAdded;
 
         private KeyValidator _validator;
 
@@ -32,6 +35,44 @@ namespace Game.Core.ActionGraph.Editor
 
             _keysMap = new Dictionary<string, List<ActionNode>>();
             _validator = new KeyValidator(_config.KeyValidatorParam);
+
+            _nodesToAdded = new List<ActionNodeData>();
+            _nodesToRemove = new List<ActionNodeData>();
+        }
+
+        public void Save()
+        {
+            // Remove nodes
+            foreach (var data in _nodesToRemove)
+            {
+                _rootData.Nodes.Remove(data);
+                Object.DestroyImmediate(data, true);
+            }
+            
+            _nodesToRemove.Clear();
+            
+            // Added nodes
+            foreach (var data in _nodesToAdded)
+            {
+                if (_keysMap.TryGetValue(data.Key, out var value))
+                {
+                    if (value.Count > 1)
+                    {
+                        for (var i = 1; i < value.Count; i++)
+                        {
+                            value[i].AddKeyPostfix(i.ToString());
+                        }
+                    }
+                }
+                
+                AssetDatabase.AddObjectToAsset(data, _rootData);
+                _rootData.Nodes.Add(data);
+            }
+            
+            _nodesToAdded.Clear();
+
+            EditorUtility.SetDirty(_rootData);
+            AssetDatabase.SaveAssetIfDirty(_rootData);
         }
 
         private void AddManipulators()
@@ -81,7 +122,7 @@ namespace Game.Core.ActionGraph.Editor
         
         public void LoadData(ActionGraphData graphData)
         {
-            _actionGraphData = graphData;
+            _rootData = graphData;
             
             var actionNodes = new Dictionary<string, ActionNode>();
 
@@ -192,11 +233,7 @@ namespace Game.Core.ActionGraph.Editor
                 data.Key = _config.DefaultKeyNode;
                 data.Position = position;
                 
-                _actionGraphData.Nodes.Add(data);
-                
-                AssetDatabase.AddObjectToAsset(data, _actionGraphData);
-                
-                AssetDatabase.SaveAssetIfDirty(_actionGraphData);
+                _nodesToAdded.Add(data);
             }
             else
             {
@@ -367,9 +404,8 @@ namespace Game.Core.ActionGraph.Editor
                             {
                                 actionNode.ChangeKeyFunc -= OnRevalidateKey;
                                 actionNode.DeleteElementsRequestEvent -= OnDeleteElements;
-                                AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(actionNode.Data));
                                 RemoveKeyFromMap(actionNode);
-                                _actionGraphData.Nodes.Remove(actionNode.Data);
+                                _nodesToRemove.Add(actionNode.Data);
                                 break;
                             }
                         }
