@@ -15,9 +15,8 @@ namespace Game.Core.ActionGraph.Runtime
 
         [Space]
         [Header("Processors")]
-        [SerializeField] private List<ProcessorHub> _processorHubs;
-        [SerializeField] private TransitionProcessor _transitionProcessor;
+        [SerializeReference] private IActionProcessorData _data;
 
-        public IReadOnlyList<ProcessorHub> ProcessorHubs => _processorHubs;
+        public IActionProcessorData Data => _data;
     }
 }

@@ -1,31 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
-using Sirenix.OdinInspector;
+using System.Threading;
 
 namespace Game.Core.ActionGraph.Runtime
 {
     public class ActionGraphReceiver
     {
         private ActionGraphData _graphData;
+        private ProcessorSelector _selector;
+        private ActionNodeSelector _actionNodeSelector;
+        
         private Dictionary<string, ActionNodeData> _graph;
-
-        private Dictionary<string, Action> _actionMap;
+        private CancellationTokenSource _runToken;
 
         public event Action<ActionNodeData> SwitchNodeEvent;
         
         public ActionNodeData CurrentActionNodeData { get; private set; }
 
-        public ActionGraphReceiver(ActionGraphData data)
+        public ActionGraphReceiver(ActionGraphData data, ProcessorSelector selector, ActionNodeSelector actionNodeSelector)
         {
             _graphData = data;
+            _selector = selector;
+            _actionNodeSelector = actionNodeSelector;
             
             _graph = new Dictionary<string, ActionNodeData>();
-            _actionMap = new Dictionary<string, Action>();
 
-            // foreach (var nodeData in _graphData.Nodes)
-            // {
-            //     _graph.Add(nodeData.Key, nodeData);
-            // }
+            foreach (var nodeData in _graphData.Nodes)
+            {
+                _graph.Add(nodeData.Key, nodeData);
+            }
         }
 
         public void SwitchToNode(string nodeId)
@@ -36,10 +39,10 @@ namespace Game.Core.ActionGraph.Runtime
             }
             
             CurrentActionNodeData = _graph[nodeId];
-            
+
             SwitchNodeEvent?.Invoke(CurrentActionNodeData);
             
-            InvokeSwitchConcreteNode(nodeId);
+            InvokeAction();
         }
 
         public void SwitchToNextNode(int transitionIndex = 0)
@@ -47,32 +50,15 @@ namespace Game.Core.ActionGraph.Runtime
             SwitchToNode(CurrentActionNodeData.Transitions[transitionIndex].nodeKey);
         }
 
-        public void SubscribeToSwitchConcreteNode(string nodeKey, Action action)
+        private async void InvokeAction()
         {
-            if (_actionMap.ContainsKey(nodeKey))
-            {
-                _actionMap[nodeKey] += action;
-            }
-            else
-            {
-                _actionMap.Add(nodeKey, action);
-            }
-        }
-        
-        public void UnsubscribeToSwitchConcreteNode(string nodeKey, Action action)
-        {
-            if (_actionMap.ContainsKey(nodeKey))
-            {
-                _actionMap[nodeKey] -= action;
-            }
-        }
+            _runToken = new CancellationTokenSource();
+            
+            await _selector.Select(CurrentActionNodeData.Data);
 
-        private void InvokeSwitchConcreteNode(string nodeKey)
-        {
-            if (_actionMap.ContainsKey(nodeKey))
-            {
-                _actionMap[nodeKey]?.Invoke();
-            }
+            var transitionData = await _actionNodeSelector.SelectNode(CurrentActionNodeData.Transitions);
+            
+            SwitchToNode(transitionData.nodeKey);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using Game.Core.ActionGraph.Runtime;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,15 +17,15 @@ namespace Game.Core.Panels
         public event Action<TransitionItem> ClickTransitionEvent;
 
         public TransitionPosition Position => _position;
-        
-        public string Key { get; private set; }
 
-        public void Setup(TransitionParam param)
+        public TransitionData Data { get; private set; }
+
+        public void Setup(TransitionData data)
         {
-            _background.sprite = param.background;
-            _title.text = param.title;
+            _background.sprite = data.background;
+            _title.text = data.title;
 
-            Key = param.key;
+            Data = data;
         }
 
         private void OnEnable()

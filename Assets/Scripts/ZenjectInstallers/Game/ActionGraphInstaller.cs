@@ -14,6 +14,13 @@ namespace ZenjectInstallers.Game
         {
             container.BindInstance(_graphData);
             container.BindInterfacesAndSelfTo<ActionGraphReceiver>().AsSingle().NonLazy();
+            container.BindInterfacesAndSelfTo<ProcessorSelector>().AsSingle().NonLazy();
+            container.BindInterfacesAndSelfTo<RunnerFactory>().AsSingle().NonLazy();
+            container.BindInterfacesAndSelfTo<ActionNodeSelector>().AsSingle().NonLazy();
+            
+            //Processors
+            container.BindInterfacesTo<TextProcessor>().AsSingle().NonLazy();
+            container.BindInterfacesTo<ProcessorContainer>().AsSingle().NonLazy();
         }
     }
 }

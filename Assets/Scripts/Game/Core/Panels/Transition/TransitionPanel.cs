@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Game.Core.ActionGraph.Runtime;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,7 +13,7 @@ namespace Game.Core.Panels
         
         [SerializeField] private List<TransitionItem> _items;
 
-        private string _result;
+        private TransitionData _result;
         private bool _isNotifyClick = true;
 
         public event Action ClickEvent; 
@@ -37,13 +38,13 @@ namespace Game.Core.Panels
             }
         }
 
-        public async UniTask<string> WaitSelection(List<TransitionParam> param)
+        public async UniTask<TransitionData> WaitSelection(List<TransitionData> data)
         {
             _isNotifyClick = false;
             
-            if (param.Count > 1)
+            if (data.Count > 1)
             {
-                Setup(param);
+                Setup(data);
             }
 
             await UniTask.WaitUntilValueChanged(this,_ => _result);
@@ -53,11 +54,11 @@ namespace Game.Core.Panels
             return _result;
         }
 
-        private void Setup(List<TransitionParam> param)
+        private void Setup(List<TransitionData> data)
         {
             foreach (var selection in _items)
             {
-                var suitableParam = param.Find(x => x.transitionPosition == selection.Position);
+                var suitableParam = data.Find(x => x.transitionPosition == selection.Position);
 
                 if (suitableParam == null)
                 {
@@ -79,7 +80,7 @@ namespace Game.Core.Panels
                 selection.gameObject.SetActive(false);
             }
 
-            _result = selectItem.Key;
+            _result = selectItem.Data;
         }
     }
 }

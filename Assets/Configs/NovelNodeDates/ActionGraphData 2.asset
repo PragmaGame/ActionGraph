@@ -19,12 +19,13 @@ MonoBehaviour:
     transitionPosition: 0
     background: {fileID: 0}
     title: 
-  _processorHubs: []
-  _transitionProcessor:
-    _transitionParams: []
+  _data:
+    rid: -2
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -61,12 +62,13 @@ MonoBehaviour:
     transitionPosition: 0
     background: {fileID: 0}
     title: 
-  _processorHubs: []
-  _transitionProcessor:
-    _transitionParams: []
+  _data:
+    rid: -2
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
 --- !u!114 &4370372235718634098
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -86,9 +88,25 @@ MonoBehaviour:
     transitionPosition: 0
     background: {fileID: 0}
     title: 
-  _processorHubs: []
-  _transitionProcessor:
-    _transitionParams: []
+  _data:
+    rid: 1788503463848050688
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 1788503463848050688
+      type: {class: ProcessorContainerData, ns: Game.Core.ActionGraph.Runtime, asm: Assembly-CSharp}
+      data:
+        runnerType: 2
+        dates:
+        - rid: 1788503463848050689
+    - rid: 1788503463848050689
+      type: {class: ProcessorContainerData, ns: Game.Core.ActionGraph.Runtime, asm: Assembly-CSharp}
+      data:
+        runnerType: 2
+        dates:
+        - rid: 1788503463848050690
+    - rid: 1788503463848050690
+      type: {class: TextProcessorData, ns: Game.Core.ActionGraph.Runtime, asm: Assembly-CSharp}
+      data:
+        textKey: hello
+        speakerName: Mark

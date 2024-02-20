@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 
-namespace Game.Core.Hub.ProcessRunners
+namespace Game.Core.ActionGraph.Runtime
 {
     public interface IProcessRunner
     {
