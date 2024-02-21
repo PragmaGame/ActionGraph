@@ -14,9 +14,8 @@ namespace Game.Core.ActionGraph.Runtime
         public List<TransitionData> Transitions { get; set; } = new();
 
         [Space]
-        [Header("Processors")]
-        [SerializeReference] private IActionProcessorData _data;
+        [SerializeReference] private IActionProcessor _processor = new HubProcessor();
 
-        public IActionProcessorData Data => _data;
+        public IActionProcessor Processor => _processor;
     }
 }

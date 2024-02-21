@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using Game.Core.ActionGraph.Runtime;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Object = UnityEngine.Object;
 
 namespace Game.Core.ActionGraph.Editor
 {
@@ -22,10 +19,14 @@ namespace Game.Core.ActionGraph.Editor
 
         public string Key => Data.Key;
 
+        private TextField _debugText;
+
         public ActionNode(ActionNodeData data)
         {
             Data = data;
 
+            title = "Action";
+            
             mainContainer.AddToClassList(StylesConstant.NodeConstant.MAIN_CONTAINER);
             extensionContainer.AddToClassList(StylesConstant.NodeConstant.EXTENSION_CONTAINER);
 
@@ -61,10 +62,11 @@ namespace Game.Core.ActionGraph.Editor
 
             keyTextField.AddToClassList(StylesConstant.NodeConstant.NODE_TEXT_FIELD);
             keyTextField.AddToClassList(StylesConstant.NodeConstant.NODE_FILENAME_TEXT_FIELD);
-            keyTextField.AddToClassList(StylesConstant.NodeConstant.NODE_TEXT_FIELD_HIDDEN);
+            //keyTextField.AddToClassList(StylesConstant.NodeConstant.NODE_TEXT_FIELD_HIDDEN);
 
-            titleContainer.Clear();
-            titleContainer.Add(keyTextField);
+            //titleContainer.Clear();
+            titleButtonContainer.Clear();
+            mainContainer.Insert(1, keyTextField);
 
             var addTransitionButton = new Button(OnClickAddTransitionButton)
             {
@@ -73,17 +75,37 @@ namespace Game.Core.ActionGraph.Editor
             
             addTransitionButton.AddToClassList(StylesConstant.NodeConstant.NODE_BUTTON);
             
-            mainContainer.Insert(1, addTransitionButton);
+            mainContainer.Insert(2, addTransitionButton);
 
             _inputPort = InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(bool));
             _inputPort.portName = "Input";
             inputContainer.Add(_inputPort);
+
+            _debugText = new TextField()
+            {
+                multiline = true,
+                focusable = false,
+                tooltip = "Debug"
+            };
             
+            _debugText.AddToClassList(StylesConstant.NodeConstant.NODE_TEXT_FIELD);
+            _debugText.AddToClassList(StylesConstant.NodeConstant.QUOTE_TEXT_FIELD);
+                
+            extensionContainer.Add(_debugText);
+
             CreateTransitions();
 
             RefreshExpandedState();
         }
 
+        private void RefreshDebugInfo()
+        {
+            // if (Data.Processor is HubProcessor hub)
+            // {
+            //     
+            // }
+        }
+        
         private void OnClickAddTransitionButton() => CreateTransitionPort();
 
         private void CreateTransitions()

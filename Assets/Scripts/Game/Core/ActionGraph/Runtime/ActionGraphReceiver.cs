@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using Zenject;
 
 namespace Game.Core.ActionGraph.Runtime
 {
     public class ActionGraphReceiver
     {
         private ActionGraphData _graphData;
-        private ProcessorSelector _selector;
+        private DiContainer _container;
         private ActionNodeSelector _actionNodeSelector;
         
         private Dictionary<string, ActionNodeData> _graph;
@@ -17,10 +18,10 @@ namespace Game.Core.ActionGraph.Runtime
         
         public ActionNodeData CurrentActionNodeData { get; private set; }
 
-        public ActionGraphReceiver(ActionGraphData data, ProcessorSelector selector, ActionNodeSelector actionNodeSelector)
+        public ActionGraphReceiver(ActionGraphData data, DiContainer container, ActionNodeSelector actionNodeSelector)
         {
             _graphData = data;
-            _selector = selector;
+            _container = container;
             _actionNodeSelector = actionNodeSelector;
             
             _graph = new Dictionary<string, ActionNodeData>();
@@ -53,8 +54,12 @@ namespace Game.Core.ActionGraph.Runtime
         private async void InvokeAction()
         {
             _runToken = new CancellationTokenSource();
+
+            var processor = CurrentActionNodeData.Processor.Clone();
             
-            await _selector.Select(CurrentActionNodeData.Data);
+            _container.Inject(processor);
+            
+            await processor.RunProcess(_runToken.Token);
 
             var transitionData = await _actionNodeSelector.SelectNode(CurrentActionNodeData.Transitions);
             

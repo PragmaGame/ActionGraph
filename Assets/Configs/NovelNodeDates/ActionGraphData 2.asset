@@ -1,5 +1,35 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-1808737598000464039
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e81e533a681e49f09fc0a86dc1b6476d, type: 3}
+  m_Name: a22
+  m_EditorClassIdentifier: 
+  <Key>k__BackingField: a22
+  <Position>k__BackingField: {x: 466, y: 260}
+  <Transitions>k__BackingField:
+  - nodeKey: a3
+    transitionPosition: 0
+    background: {fileID: 0}
+    title: 
+  _processor:
+    rid: 1788503482673135618
+  references:
+    version: 2
+    RefIds:
+    - rid: 1788503482673135618
+      type: {class: TextProcessor, ns: Game.Core.ActionGraph.Runtime, asm: Assembly-CSharp}
+      data:
+        _textKey: 
+        _speakerName: "\u041A\u0442\u043E-\u0442\u043E"
+        _debugText: "\u0425\u043E\u0440\u043E\u0448\u043E"
 --- !u!114 &-1202088143798698428
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10,22 +40,30 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e81e533a681e49f09fc0a86dc1b6476d, type: 3}
-  m_Name: t4
+  m_Name: a1
   m_EditorClassIdentifier: 
-  <Key>k__BackingField: t4
-  <Position>k__BackingField: {x: 188, y: 429}
+  <Key>k__BackingField: a1
+  <Position>k__BackingField: {x: 141, y: 395}
   <Transitions>k__BackingField:
-  - nodeKey: 
-    transitionPosition: 0
+  - nodeKey: a22
+    transitionPosition: 2
     background: {fileID: 0}
-    title: 
-  _data:
-    rid: -2
+    title: "\u0410"
+  - nodeKey: a2
+    transitionPosition: 3
+    background: {fileID: 0}
+    title: "\u0412"
+  _processor:
+    rid: 1788503479968333824
   references:
     version: 2
     RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
+    - rid: 1788503479968333824
+      type: {class: TextProcessor, ns: Game.Core.ActionGraph.Runtime, asm: Assembly-CSharp}
+      data:
+        _textKey: hello
+        _speakerName: "\u041C\u0430\u0440\u043A"
+        _debugText: "\u041A\u0430\u043A \u0434\u0435\u043B\u0430 ?"
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -43,6 +81,7 @@ MonoBehaviour:
   - {fileID: -1202088143798698428}
   - {fileID: 909795601845819081}
   - {fileID: 4370372235718634098}
+  - {fileID: -1808737598000464039}
 --- !u!114 &909795601845819081
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -53,22 +92,26 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e81e533a681e49f09fc0a86dc1b6476d, type: 3}
-  m_Name: t2
+  m_Name: a2
   m_EditorClassIdentifier: 
-  <Key>k__BackingField: t2
-  <Position>k__BackingField: {x: 466, y: 435}
+  <Key>k__BackingField: a2
+  <Position>k__BackingField: {x: 466, y: 552}
   <Transitions>k__BackingField:
-  - nodeKey: 
+  - nodeKey: a3
     transitionPosition: 0
     background: {fileID: 0}
     title: 
-  _data:
-    rid: -2
+  _processor:
+    rid: 1788503482673135616
   references:
     version: 2
     RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
+    - rid: 1788503482673135616
+      type: {class: TextProcessor, ns: Game.Core.ActionGraph.Runtime, asm: Assembly-CSharp}
+      data:
+        _textKey: how-are-you
+        _speakerName: "\u041A\u0442\u043E-\u0442\u043E"
+        _debugText: "\u041F\u043B\u043E\u0445\u043E"
 --- !u!114 &4370372235718634098
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -79,34 +122,38 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e81e533a681e49f09fc0a86dc1b6476d, type: 3}
-  m_Name: a1
+  m_Name: a3
   m_EditorClassIdentifier: 
-  <Key>k__BackingField: a1
-  <Position>k__BackingField: {x: 684, y: 459}
+  <Key>k__BackingField: a3
+  <Position>k__BackingField: {x: 813, y: 435}
   <Transitions>k__BackingField:
   - nodeKey: 
     transitionPosition: 0
     background: {fileID: 0}
     title: 
-  _data:
-    rid: 1788503463848050688
+  _processor:
+    rid: 1788503465994223616
   references:
     version: 2
     RefIds:
-    - rid: 1788503463848050688
-      type: {class: ProcessorContainerData, ns: Game.Core.ActionGraph.Runtime, asm: Assembly-CSharp}
+    - rid: 1788503465994223616
+      type: {class: HubProcessor, ns: Game.Core.ActionGraph.Runtime, asm: Assembly-CSharp}
       data:
-        runnerType: 2
-        dates:
-        - rid: 1788503463848050689
-    - rid: 1788503463848050689
-      type: {class: ProcessorContainerData, ns: Game.Core.ActionGraph.Runtime, asm: Assembly-CSharp}
+        _runner:
+          rid: 1788503486605033472
+        _processors:
+        - rid: 1788503479043227648
+        - rid: 1788503486605033473
+    - rid: 1788503479043227648
+      type: {class: TextProcessor, ns: Game.Core.ActionGraph.Runtime, asm: Assembly-CSharp}
       data:
-        runnerType: 2
-        dates:
-        - rid: 1788503463848050690
-    - rid: 1788503463848050690
-      type: {class: TextProcessorData, ns: Game.Core.ActionGraph.Runtime, asm: Assembly-CSharp}
+        _textKey: fine
+        _speakerName: "\u041C\u0430\u0440\u043A"
+        _debugText: "\u041F\u043E\u043A\u0430"
+    - rid: 1788503486605033472
+      type: {class: ParallelProcessRunner, ns: Game.Core.ActionGraph.Runtime, asm: Assembly-CSharp}
+      data: 
+    - rid: 1788503486605033473
+      type: {class: BackgroundSwitchProcessor, ns: Game.Core.ActionGraph.Runtime.Background, asm: Assembly-CSharp}
       data:
-        textKey: hello
-        speakerName: Mark
+        _sprite: {fileID: 21300000, guid: 6be003acbe390614f9415220c180a387, type: 3}

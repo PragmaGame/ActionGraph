@@ -9,47 +9,15 @@ namespace Game.Core.Panels
 {
     public class TransitionPanel : MonoBehaviour
     {
-        [SerializeField] private Button _mainButton;
-        
         [SerializeField] private List<TransitionItem> _items;
 
         private TransitionData _result;
-        private bool _isNotifyClick = true;
-
-        public event Action ClickEvent; 
-
-        private void OnEnable()
-        {
-            _mainButton.onClick.AddListener(OnClickMainButton);
-        }
-
-        private void OnDisable()
-        {
-            _mainButton.onClick.RemoveListener(OnClickMainButton);
-        }
-
-        private void OnClickMainButton()
-        {
-            _result = null;
-
-            if (_isNotifyClick)
-            {
-                ClickEvent?.Invoke();
-            }
-        }
-
+        
         public async UniTask<TransitionData> WaitSelection(List<TransitionData> data)
         {
-            _isNotifyClick = false;
-            
-            if (data.Count > 1)
-            {
-                Setup(data);
-            }
+            Setup(data);
 
             await UniTask.WaitUntilValueChanged(this,_ => _result);
-
-            _isNotifyClick = true;
             
             return _result;
         }

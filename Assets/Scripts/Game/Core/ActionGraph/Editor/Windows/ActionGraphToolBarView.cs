@@ -10,16 +10,11 @@ namespace Game.Core.ActionGraph.Editor
         private ActionGraphToolBarViewConfig _config;
 
         private TextField _searchTextField;
-
-        private Button _updateButton;
-        private Button _saveButton;
-        private Button _loadButton;
+        
         private Button _miniMapButton;
 
         private string _lastOpenGraphPath;
-
-        public event Action<string> ClickSaveButtonEvent;
-        public event Action<string> ClickLoadButtonEvent;
+        
         public event Action<string> ChangeSearchFieldEvent;
         public event Action ClickMiniMapButtonEvent;
         
@@ -40,27 +35,6 @@ namespace Game.Core.ActionGraph.Editor
             
             Toolbar.Add(_searchTextField);
 
-            _updateButton = new Button(OnClickUpdateButton)
-            {
-                text = "Update",
-            };
-            
-            Toolbar.Add(_updateButton);
-            
-            _saveButton = new Button(OnClickSaveButton)
-            {
-                text = "Save",
-            };
-            
-            Toolbar.Add(_saveButton);
-            
-            _loadButton = new Button(OnClickLoadButton)
-            {
-                text = "Load",
-            };
-            
-            Toolbar.Add(_loadButton);
-            
             _miniMapButton = new Button(OnClickMiniMapButton)
             {
                 text = "Mini Map",
@@ -69,27 +43,6 @@ namespace Game.Core.ActionGraph.Editor
             Toolbar.Add(_miniMapButton);
             
             Toolbar.styleSheets.Add(_config.StyleSheet);
-        }
-
-        private void OnClickLoadButton()
-        {
-            var filePath = EditorUtility.OpenFilePanel("Action Graphs", "Assets/", "asset");
-
-            _lastOpenGraphPath = filePath;
-            
-            ClickLoadButtonEvent?.Invoke(filePath);
-        }
-
-        private void OnClickSaveButton()
-        {
-            var filePath = EditorUtility.SaveFilePanel("Action Graphs", "Assets/","ActionGraphFileName","asset");
-            
-            ClickSaveButtonEvent?.Invoke(filePath);
-        }
-        
-        private void OnClickUpdateButton()
-        {
-            ClickSaveButtonEvent?.Invoke(_lastOpenGraphPath);
         }
 
         private void OnClickMiniMapButton()

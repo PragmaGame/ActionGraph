@@ -5,14 +5,13 @@ using Cysharp.Threading.Tasks;
 namespace Game.Core.ActionGraph.Runtime
 {
     [Serializable]
-    public class SequenceProcessRunner : IProcessRunner
+    public class ParallelProcessRunner : IProcessRunner
     {
         public async UniTask RunProcess(IEnumerable<UniTask> processors)
         {
-            foreach (var processor in processors)
-            {
-                await processor;
-            }
+            await UniTask.WhenAll(processors);
         }
+        
+        public IProcessRunner Clone() => new ParallelProcessRunner();
     }
 }

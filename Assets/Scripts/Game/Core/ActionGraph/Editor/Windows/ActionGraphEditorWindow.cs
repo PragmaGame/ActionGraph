@@ -69,26 +69,13 @@ namespace Game.Core.ActionGraph.Editor
         private void AddToolBar()
         {
             _actionGraphToolBarView = new ActionGraphToolBarView(_config.ActionGraphToolBarViewConfig);
-
-            _actionGraphToolBarView.ClickSaveButtonEvent += OnClickSaveButton;
-            _actionGraphToolBarView.ClickLoadButtonEvent += OnClickLoadButton;
+            
             _actionGraphToolBarView.ClickMiniMapButtonEvent += OnClickMiniMapButton;
             _actionGraphToolBarView.ChangeSearchFieldEvent += OnChangeSearchField;
 
             rootVisualElement.Add(_actionGraphToolBarView.Toolbar);
         }
 
-        private void OnClickSaveButton(string filePath)
-        {
-            //ActionGraphSaveUtility.Save(_actionGraphView, filePath);
-            _actionGraphView.Save();
-        }
-
-        private void OnClickLoadButton(string filePath)
-        {
-            //ActionGraphSaveUtility.Load(_actionGraphView, filePath);
-        }
-        
         private void OnClickMiniMapButton()
         {
             _actionGraphView.SwitchActiveMiniMap();

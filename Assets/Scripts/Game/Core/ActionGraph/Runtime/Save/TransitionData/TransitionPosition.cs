@@ -2,10 +2,11 @@
 {
     public enum TransitionPosition
     {
-        Center = 0,
-        Left = 1,
-        Right = 2,
-        Up = 3,
-        Down = 4,
+        None = 0,
+        Center = 1,
+        Left = 2,
+        Right = 3,
+        Up = 4,
+        Down = 5,
     }
 }
