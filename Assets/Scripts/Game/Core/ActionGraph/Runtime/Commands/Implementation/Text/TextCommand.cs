@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Game.Core.Localization;
@@ -10,7 +11,7 @@ using Zenject;
 namespace Game.Core.ActionGraph.Runtime
 {
     [Serializable]
-    public class TextProcessor : IActionProcessor
+    public class TextCommand : IActionCommand
     {
         [ValueDropdown("@EditorLocalizationHelper.GetKeys()")]
         [SerializeField] private string _textKey;
@@ -21,11 +22,11 @@ namespace Game.Core.ActionGraph.Runtime
         private DialoguePanel _dialoguePanel;
         private LocalizationService _localizationService;
 
-        public TextProcessor()
+        public TextCommand()
         {
         }
         
-        protected TextProcessor(TextProcessor data)
+        protected TextCommand(TextCommand data)
         {
             _textKey = string.Copy(data._textKey);
             _speakerName = string.Copy(data._speakerName);
@@ -39,11 +40,29 @@ namespace Game.Core.ActionGraph.Runtime
             _localizationService = localizationService;
         }
         
-        public async UniTask RunProcess(CancellationToken token = default)
+        public async UniTask Execute(CancellationToken token = default)
         {
             await _dialoguePanel.ShowText(_speakerName, _debugText);
         }
 
-        public IActionProcessor Clone() => new TextProcessor(this);
+#if UNITY_EDITOR
+        public string GetInfo(string separator)
+        {
+            var info = string.Empty;
+
+            if (!string.IsNullOrEmpty(_debugText))
+            {
+                info = _debugText;
+            }
+            else if(!string.IsNullOrEmpty(_textKey))
+            {
+                info = EditorLocalizationHelper.GetString(_textKey);
+            }
+            
+            return $"Text : {info}";
+        }
+#endif
+
+        public virtual IActionCommand Clone() => new TextCommand(this);
     }
 }

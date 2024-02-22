@@ -50,6 +50,11 @@ namespace Game.Core.ActionGraph.Editor
             }
             
             _nodesToRemove.Clear();
+
+            // foreach (var actionNode in _rootData.Nodes)
+            // {
+            //     EditorUtility.SetDirty(actionNode);
+            // }
             
             // Added nodes
             foreach (var data in _nodesToAdded)
@@ -406,6 +411,7 @@ namespace Game.Core.ActionGraph.Editor
                                 actionNode.DeleteElementsRequestEvent -= OnDeleteElements;
                                 RemoveKeyFromMap(actionNode);
                                 _nodesToRemove.Add(actionNode.Data);
+                                _nodesToAdded.Remove(actionNode.Data);
                                 break;
                             }
                         }

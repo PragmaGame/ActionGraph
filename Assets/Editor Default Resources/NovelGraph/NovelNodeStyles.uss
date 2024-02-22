@@ -72,7 +72,7 @@
     border-left-color: var(--ng-colors-window-dark-grey-6);
     border-left-width: var(--ng-metrics-window-pixels-4);
     padding: var(--ng-metrics-window-pixels-16);
-    max-width: var(--ng-metrics-window-pixels-600);
+    /*max-width: var(--ng-metrics-window-pixels-600);*/
 }
 
 .ng-node__quote-text-field > .unity-text-field__input:hover

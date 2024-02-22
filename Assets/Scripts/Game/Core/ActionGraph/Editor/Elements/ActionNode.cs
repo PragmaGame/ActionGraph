@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using Game.Core.ActionGraph.Runtime;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
@@ -85,12 +86,13 @@ namespace Game.Core.ActionGraph.Editor
             {
                 multiline = true,
                 focusable = false,
-                tooltip = "Debug"
+                tooltip = "Debug",
             };
             
-            _debugText.AddToClassList(StylesConstant.NodeConstant.NODE_TEXT_FIELD);
             _debugText.AddToClassList(StylesConstant.NodeConstant.QUOTE_TEXT_FIELD);
-                
+            
+            RefreshDebugInfo();
+
             extensionContainer.Add(_debugText);
 
             CreateTransitions();
@@ -100,17 +102,14 @@ namespace Game.Core.ActionGraph.Editor
 
         private void RefreshDebugInfo()
         {
-            // if (Data.Processor is HubProcessor hub)
-            // {
-            //     
-            // }
+            _debugText.value = Data.Command.GetInfo();
         }
         
         private void OnClickAddTransitionButton() => CreateTransitionPort();
 
         private void CreateTransitions()
         {
-            if (Data.Transitions == null || Data.Transitions.Count < 1)
+            if (Data.Transitions.Count < 1)
             {
                 CreateTransitionPort();
             }
@@ -144,7 +143,7 @@ namespace Game.Core.ActionGraph.Editor
             deleteTransitionButton.AddToClassList(StylesConstant.NodeConstant.NODE_BUTTON);
             
             transitionPort.Add(deleteTransitionButton);
-                
+
             outputContainer.Add(transitionPort);
         }
 
@@ -155,11 +154,11 @@ namespace Game.Core.ActionGraph.Editor
 
         private void OnClickDeleteTransitionButton(Port port, TransitionData transitionData)
         {
-            if (Data.Transitions.Count == 1)
+            if (Data.Transitions.Count <= 1)
             {
                 return;
             }
-
+            
             var elements = new List<GraphElement>();
             
             if (port.connected)

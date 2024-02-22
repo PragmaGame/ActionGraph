@@ -13,12 +13,12 @@ namespace ZenjectInstallers.Game
         public void InstallBindings(DiContainer container)
         {
             container.BindInstance(_graphData);
-            container.BindInterfacesAndSelfTo<ActionGraphReceiver>().AsSingle().NonLazy();
+            container.BindInterfacesAndSelfTo<ActionGraphInvoker>().AsSingle().NonLazy();
             container.BindInterfacesAndSelfTo<ActionNodeSelector>().AsSingle().NonLazy();
             
             //Processors
-            container.BindInterfacesTo<TextProcessor>().AsSingle().NonLazy();
-            container.BindInterfacesTo<HubProcessor>().AsSingle().NonLazy();
+            container.BindInterfacesTo<TextCommand>().AsSingle().NonLazy();
+            container.BindInterfacesTo<ContainerCommand>().AsSingle().NonLazy();
         }
     }
 }

@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 using UnityEditor;
 using UnityEngine;
 
-namespace Game.Core.Hub.Editor
+namespace Game.Core.ActionGraph.Editor
 {
     [UsedImplicitly]
     public static class ActionGraphDataEditorHelper
@@ -20,8 +20,6 @@ namespace Game.Core.Hub.Editor
         [UsedImplicitly]
         public static IEnumerable<ActionNodeData> GetNodes()
         {
-            Debug.Log("Get Nodes");
-            
             return AssetDatabase.FindAssets($"t:{typeof(ActionGraphData)}")
                 .Select(AssetDatabase.GUIDToAssetPath)
                 .Select(AssetDatabase.LoadAssetAtPath<ActionGraphData>)

@@ -38,6 +38,18 @@ namespace Game.Core.Localization
 
             return map;
         }
+
+        public string GetString(string key, string language = null)
+        {
+            if (string.IsNullOrEmpty(language))
+            {
+                language = _defaultLanguage;
+            }
+            
+            var languageIndex = _languages.FindIndex(matchLanguage => matchLanguage.Contains(language));
+
+            return languageIndex == -1 ? string.Empty : _localizations[key][languageIndex];
+        }
     }
     
     [Serializable]

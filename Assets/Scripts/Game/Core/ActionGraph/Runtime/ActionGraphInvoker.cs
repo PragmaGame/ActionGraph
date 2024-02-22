@@ -5,20 +5,20 @@ using Zenject;
 
 namespace Game.Core.ActionGraph.Runtime
 {
-    public class ActionGraphReceiver
+    public class ActionGraphInvoker
     {
         private ActionGraphData _graphData;
         private DiContainer _container;
         private ActionNodeSelector _actionNodeSelector;
         
         private Dictionary<string, ActionNodeData> _graph;
-        private CancellationTokenSource _runToken;
+        private CancellationTokenSource _invokeToken;
 
         public event Action<ActionNodeData> SwitchNodeEvent;
         
         public ActionNodeData CurrentActionNodeData { get; private set; }
 
-        public ActionGraphReceiver(ActionGraphData data, DiContainer container, ActionNodeSelector actionNodeSelector)
+        public ActionGraphInvoker(ActionGraphData data, DiContainer container, ActionNodeSelector actionNodeSelector)
         {
             _graphData = data;
             _container = container;
@@ -43,27 +43,27 @@ namespace Game.Core.ActionGraph.Runtime
 
             SwitchNodeEvent?.Invoke(CurrentActionNodeData);
             
-            InvokeAction();
+            InvokeAction(CurrentActionNodeData);
         }
 
-        public void SwitchToNextNode(int transitionIndex = 0)
+        public async void InvokeAction(ActionNodeData data)
         {
-            SwitchToNode(CurrentActionNodeData.Transitions[transitionIndex].nodeKey);
-        }
+            _invokeToken = new CancellationTokenSource();
 
-        private async void InvokeAction()
-        {
-            _runToken = new CancellationTokenSource();
-
-            var processor = CurrentActionNodeData.Processor.Clone();
+            var currentCommand = data.Command.Clone();
             
-            _container.Inject(processor);
+            _container.Inject(currentCommand);
             
-            await processor.RunProcess(_runToken.Token);
+            await currentCommand.Execute(_invokeToken.Token);
 
             var transitionData = await _actionNodeSelector.SelectNode(CurrentActionNodeData.Transitions);
             
             SwitchToNode(transitionData.nodeKey);
+        }
+
+        public void CancelInvoke()
+        {
+            _invokeToken?.Cancel();
         }
     }
 }

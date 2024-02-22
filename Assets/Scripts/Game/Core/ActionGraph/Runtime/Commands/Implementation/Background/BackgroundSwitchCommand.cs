@@ -8,18 +8,18 @@ using Zenject;
 namespace Game.Core.ActionGraph.Runtime.Background
 {
     [Serializable]
-    public class BackgroundSwitchProcessor : IActionProcessor
+    public class BackgroundSwitchCommand : IActionCommand
     {
         [SerializeField] private Sprite _sprite;
 
         private BackgroundPanel _panel;
         
-        public BackgroundSwitchProcessor()
+        public BackgroundSwitchCommand()
         {
             
         }
 
-        protected BackgroundSwitchProcessor(BackgroundSwitchProcessor data)
+        protected BackgroundSwitchCommand(BackgroundSwitchCommand data)
         {
             _sprite = data._sprite;
         }
@@ -30,13 +30,13 @@ namespace Game.Core.ActionGraph.Runtime.Background
             _panel = panel;
         }
         
-        public UniTask RunProcess(CancellationToken token = default)
+        public UniTask Execute(CancellationToken token = default)
         {
             _panel.SwitchBackground(_sprite);
             
             return UniTask.CompletedTask;
         }
 
-        public IActionProcessor Clone() => new BackgroundSwitchProcessor(this);
+        public IActionCommand Clone() => new BackgroundSwitchCommand(this);
     }
 }
