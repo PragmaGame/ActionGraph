@@ -9,27 +9,45 @@ namespace Game.Core.Localization
         private LocalizationConfig _config;
         
         private Dictionary<string, string> _map;
+        private Dictionary<string, string> _mapDefault;
 
         public LocalizationService(LocalizationConfig config)
         {
             _config = config;
             
-            SetLocalization();
+            LoadLocalization();
         }
 
+        private void LoadLocalization()
+        {
+            _mapDefault = _config.GetDefaultLocalization();
+            _map = _mapDefault;
+
+            // if (!TrySetLocalization(Application.systemLanguage))
+            // {
+            //     _map = _mapDefault;
+            // }
+        }
+        
         public string GetString(string key)
         {
-            return _map[key];
+            if (_map.TryGetValue(key, out var value))
+            {
+                return value;
+            }
+            
+            return _mapDefault[key];
         }
 
-        public void SetLocalization(string language = null)
+        public bool TrySetLocalization(SystemLanguage language)
         {
-            if (string.IsNullOrEmpty(language))
+            if(_config.TryGetLocalization(language, out var map))
             {
-                language = Enum.GetName(typeof(SystemLanguage), Application.systemLanguage);
+                _map = map;
+                return true;
             }
-
-            _map = _config.TryGetLocalization(language, out var map) ? map : _config.GetDefaultLocalization();
+            
+            return false;
         }
     }
 }

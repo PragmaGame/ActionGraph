@@ -10,17 +10,17 @@ namespace Game.Core.Localization
     public partial class LocalizationConfig : ScriptableObject
     {
         [SerializeField] private LocalizationDictionary _localizations;
-        [SerializeField] private List<string> _languages;
+        [SerializeField] private List<SystemLanguage> _languages;
         [SerializeField] private List<string> _keys;
 
-        [SerializeField] private string _defaultLanguage = "English";
+        [SerializeField] private SystemLanguage _defaultLanguage = SystemLanguage.English;
 
         public IReadOnlyList<string> Keys => _keys;
-        public IReadOnlyList<string> Languages => _languages;
+        public IReadOnlyList<SystemLanguage> Languages => _languages;
 
-        public bool TryGetLocalization(string language, out Dictionary<string, string> map)
+        public bool TryGetLocalization(SystemLanguage language, out Dictionary<string, string> map)
         {
-            var languageIndex = _languages.FindIndex(matchLanguage => matchLanguage.Contains(language));
+            var languageIndex = _languages.FindIndex(matchLanguage => matchLanguage == language);
 
             if (languageIndex != -1)
             {
@@ -39,14 +39,11 @@ namespace Game.Core.Localization
             return map;
         }
 
-        public string GetString(string key, string language = null)
+        public string GetString(string key) => GetString(key, _defaultLanguage);
+
+        public string GetString(string key, SystemLanguage language)
         {
-            if (string.IsNullOrEmpty(language))
-            {
-                language = _defaultLanguage;
-            }
-            
-            var languageIndex = _languages.FindIndex(matchLanguage => matchLanguage.Contains(language));
+            var languageIndex = _languages.FindIndex(matchLanguage => matchLanguage == language);
 
             return languageIndex == -1 ? string.Empty : _localizations[key][languageIndex];
         }

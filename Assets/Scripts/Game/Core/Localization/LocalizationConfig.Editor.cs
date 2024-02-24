@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sirenix.OdinInspector;
@@ -19,7 +20,7 @@ namespace Game.Core.Localization
 
             var parseResult = csvParser.Parse(_csv.text, Delimiter.Comma);
 
-            _languages = parseResult[_rootTable].ToList();
+            _languages = parseResult[_rootTable].Select(language => Enum.Parse<SystemLanguage>(language, true)).ToList();
 
             parseResult.Remove(_rootTable);
             

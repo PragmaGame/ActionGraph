@@ -26,13 +26,11 @@ MonoBehaviour:
       val:
       - fine
       - "\u0445\u043E\u0440\u043E\u0448\u043E"
-  _languages:
-  - English
-  - Russian
+  _languages: 0a0000001e000000
   _keys:
   - hello
   - how-are-you
   - fine
-  _defaultLanguage: English
+  _defaultLanguage: 30
   _csv: {fileID: 4900000, guid: 8f09e889e284dce43af2ef9a301203a1, type: 3}
   _rootTable: Key

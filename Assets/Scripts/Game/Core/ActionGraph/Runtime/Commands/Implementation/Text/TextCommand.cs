@@ -42,7 +42,9 @@ namespace Game.Core.ActionGraph.Runtime
         
         public async UniTask Execute(CancellationToken token = default)
         {
-            await _dialoguePanel.ShowText(_speakerName, _debugText);
+            var text = !string.IsNullOrEmpty(_debugText) ? _debugText : _localizationService.GetString(_textKey);
+            
+            await _dialoguePanel.ShowText(_speakerName, text);
         }
 
 #if UNITY_EDITOR
