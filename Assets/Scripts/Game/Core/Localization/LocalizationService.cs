@@ -21,12 +21,15 @@ namespace Game.Core.Localization
         private void LoadLocalization()
         {
             _mapDefault = _config.GetDefaultLocalization();
+            
+#if !UNITY_EDITOR
+            if (!TrySetLocalization(Application.systemLanguage))
+            {
+                _map = _mapDefault;
+            }
+#else
             _map = _mapDefault;
-
-            // if (!TrySetLocalization(Application.systemLanguage))
-            // {
-            //     _map = _mapDefault;
-            // }
+#endif
         }
         
         public string GetString(string key)

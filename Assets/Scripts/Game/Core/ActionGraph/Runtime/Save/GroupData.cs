@@ -9,29 +9,8 @@ namespace Game.Core.ActionGraph.Runtime
     [Serializable]
     public class GroupData
     {
-        public string key;
-        public List<string> ownedNodesKeys;
-
-#if UNITY_EDITOR
-        [Space(25)]
-        [InfoBox("Editor Only")]
-        public Vector2 position;
-#endif
-        
-        public GroupData()
-        {
-        }
-        
-        protected GroupData(GroupData data)
-        {
-            key = data.key;
-            ownedNodesKeys = data.ownedNodesKeys.ToList();
-
-#if UNITY_EDITOR
-            position = data.position;
-#endif
-        }
-
-        public GroupData Clone() => new(this);
+        public string Key { get; set; }
+        public List<string> OwnedNodesKeys { get; set; }
+        public Vector2 Position { get; set; }
     }
 }

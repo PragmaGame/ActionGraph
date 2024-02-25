@@ -72,6 +72,7 @@ namespace Game.Core.ActionGraph.Editor
             
             _actionGraphToolBarView.ClickMiniMapButtonEvent += OnClickMiniMapButton;
             _actionGraphToolBarView.ChangeSearchFieldEvent += OnChangeSearchField;
+            _actionGraphToolBarView.ClickSaveButtonEvent += OnClickSaveButton;
 
             rootVisualElement.Add(_actionGraphToolBarView.Toolbar);
         }
@@ -84,6 +85,11 @@ namespace Game.Core.ActionGraph.Editor
         private void OnChangeSearchField(string value)
         {
             _actionGraphView.LookAt(value);
+        }
+
+        private void OnClickSaveButton()
+        {
+            _actionGraphView.Save();
         }
     }
 }

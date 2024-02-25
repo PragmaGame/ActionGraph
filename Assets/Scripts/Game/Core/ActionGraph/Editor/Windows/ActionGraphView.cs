@@ -76,6 +76,32 @@ namespace Game.Core.ActionGraph.Editor
             
             _nodesToAdded.Clear();
 
+            //Save groups
+            _rootData.Groups.Clear();
+            
+            foreach (var graphElement in graphElements)
+            {
+                if (graphElement is Group group)
+                {
+                    var groupData = new GroupData()
+                    {
+                        Key = group.title,
+                        Position = group.GetPosition().position,
+                        OwnedNodesKeys = new List<string>()
+                    };
+    
+                    _rootData.Groups.Add(groupData);
+                    
+                    foreach (var groupElement in group.containedElements)
+                    {
+                        if (groupElement is ActionNode ownGroupNode)
+                        {
+                            groupData.OwnedNodesKeys.Add(ownGroupNode.Key);
+                        }
+                    }
+                }
+            }
+
             EditorUtility.SetDirty(_rootData);
             AssetDatabase.SaveAssetIfDirty(_rootData);
         }
@@ -163,9 +189,9 @@ namespace Game.Core.ActionGraph.Editor
 
             foreach (var groupData in graphData.Groups)
             {
-                var group = CreateGroup(groupData.position, groupData.key);
+                var group = CreateGroup(groupData.Position, groupData.Key);
 
-                foreach (var groupNodeKey in groupData.ownedNodesKeys)
+                foreach (var groupNodeKey in groupData.OwnedNodesKeys)
                 {
                     group.AddElement(actionNodes[groupNodeKey]);
                 }

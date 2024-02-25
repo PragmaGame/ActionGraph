@@ -34,7 +34,7 @@ namespace Game.Core.ActionGraph.Editor
                 return default;
             }
             
-            return data.Groups.Select(x => x.key);
+            return data.Groups.Select(x => x.Key);
         }
     }
 }

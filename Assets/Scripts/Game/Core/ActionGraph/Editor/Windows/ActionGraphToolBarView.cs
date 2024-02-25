@@ -12,11 +12,13 @@ namespace Game.Core.ActionGraph.Editor
         private TextField _searchTextField;
         
         private Button _miniMapButton;
+        private Button _saveButton;
 
         private string _lastOpenGraphPath;
         
         public event Action<string> ChangeSearchFieldEvent;
         public event Action ClickMiniMapButtonEvent;
+        public event Action ClickSaveButtonEvent;
         
         public Toolbar Toolbar { get; private set; }
 
@@ -34,13 +36,20 @@ namespace Game.Core.ActionGraph.Editor
             _searchTextField.RegisterValueChangedCallback(OnChangeSearchTextField);
             
             Toolbar.Add(_searchTextField);
-
+            
             _miniMapButton = new Button(OnClickMiniMapButton)
             {
                 text = "Mini Map",
             };
             
             Toolbar.Add(_miniMapButton);
+
+            _saveButton = new Button(OnClickSaveButton)
+            {
+                text = "Save",
+            };
+            
+            Toolbar.Add(_saveButton);
             
             Toolbar.styleSheets.Add(_config.StyleSheet);
         }
@@ -50,6 +59,11 @@ namespace Game.Core.ActionGraph.Editor
             ClickMiniMapButtonEvent?.Invoke();
         }
 
+        private void OnClickSaveButton()
+        {
+            ClickSaveButtonEvent?.Invoke();
+        }
+        
         private void OnChangeSearchTextField(ChangeEvent<string> callback)
         {
             ChangeSearchFieldEvent?.Invoke(callback.newValue);
