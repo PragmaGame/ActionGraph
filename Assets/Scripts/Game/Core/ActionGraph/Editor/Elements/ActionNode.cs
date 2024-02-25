@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using Game.Core.ActionGraph.Runtime;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
@@ -14,11 +13,11 @@ namespace Game.Core.ActionGraph.Editor
         public ActionNodeData Data { get; private set; }
 
         public event Action<List<GraphElement>> DeleteElementsRequestEvent;
-        public event Func<ActionNode, string, string, string> ChangeKeyFunc; 
 
         private Port _inputPort;
 
         public string Key => Data.Key;
+        public string Tag => Data.Tag;
 
         private TextField _debugText;
 
@@ -41,12 +40,6 @@ namespace Game.Core.ActionGraph.Editor
             Selection.SetActiveObjectWithContext(Data, Data);
         }
 
-        public void AddKeyPostfix(string value)
-        {
-            Data.Key += value;
-            Data.name = Data.Key;
-        }
-
         public override void UpdatePresenterPosition()
         {
             Data.Position = GetPosition().position;
@@ -54,20 +47,21 @@ namespace Game.Core.ActionGraph.Editor
 
         private void CreateElements()
         {
-            var keyTextField = new TextField()
+            var tagTextField = new TextField()
             {
-                value = Key,
+                value = Data.Tag,
+                isDelayed = true
             };
             
-            keyTextField.RegisterValueChangedCallback(OnKeyFieldChange);
+            tagTextField.RegisterValueChangedCallback(OnTagFieldChange);
 
-            keyTextField.AddToClassList(StylesConstant.NodeConstant.NODE_TEXT_FIELD);
-            keyTextField.AddToClassList(StylesConstant.NodeConstant.NODE_FILENAME_TEXT_FIELD);
+            tagTextField.AddToClassList(StylesConstant.NodeConstant.NODE_TEXT_FIELD);
+            tagTextField.AddToClassList(StylesConstant.NodeConstant.NODE_FILENAME_TEXT_FIELD);
             //keyTextField.AddToClassList(StylesConstant.NodeConstant.NODE_TEXT_FIELD_HIDDEN);
 
             //titleContainer.Clear();
             titleButtonContainer.Clear();
-            mainContainer.Insert(1, keyTextField);
+            mainContainer.Insert(1, tagTextField);
 
             var addTransitionButton = new Button(OnClickAddTransitionButton)
             {
@@ -173,18 +167,12 @@ namespace Game.Core.ActionGraph.Editor
             Data.Transitions.Remove(transitionData);
         }
 
-        private void OnKeyFieldChange(ChangeEvent<string> value)
+        private void OnTagFieldChange(ChangeEvent<string> value)
         {
-            Data.Key = ChangeKeyFunc.Invoke(this, value.previousValue, value.newValue);
-            Data.name = Data.Key;
+            Data.Tag = value.newValue;
+            Data.name = Data.Tag;
 
-            (value.target as TextField)?.SetValueWithoutNotify(Key);
-
-            foreach (var edge in _inputPort.connections)
-            {
-                var transitionData = (TransitionData)edge.output.userData;
-                transitionData.nodeKey = Key;
-            }
+            (value.target as TextField)?.SetValueWithoutNotify(Data.Tag);
         }
     }
 }

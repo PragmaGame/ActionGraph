@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Game.Core.ActionGraph.Runtime;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Object = UnityEngine.Object;
 
 namespace Game.Core.ActionGraph.Editor
 {
@@ -15,12 +17,8 @@ namespace Game.Core.ActionGraph.Editor
         
         private MiniMap _miniMap;
 
-        private Dictionary<string, List<ActionNode>> _keysMap;
-
         private List<ActionNodeData> _nodesToRemove;
         private List<ActionNodeData> _nodesToAdded;
-
-        private KeyValidator _validator;
 
         public ActionGraphView(ActionGraphViewConfig config)
         {
@@ -32,9 +30,6 @@ namespace Game.Core.ActionGraph.Editor
             AddStyles();
             
             SetGraphViewChangedCallback();
-
-            _keysMap = new Dictionary<string, List<ActionNode>>();
-            _validator = new KeyValidator(_config.KeyValidatorParam);
 
             _nodesToAdded = new List<ActionNodeData>();
             _nodesToRemove = new List<ActionNodeData>();
@@ -59,17 +54,6 @@ namespace Game.Core.ActionGraph.Editor
             // Added nodes
             foreach (var data in _nodesToAdded)
             {
-                if (_keysMap.TryGetValue(data.Key, out var value))
-                {
-                    if (value.Count > 1)
-                    {
-                        for (var i = 1; i < value.Count; i++)
-                        {
-                            value[i].AddKeyPostfix(i.ToString());
-                        }
-                    }
-                }
-                
                 AssetDatabase.AddObjectToAsset(data, _rootData);
                 _rootData.Nodes.Add(data);
             }
@@ -102,6 +86,8 @@ namespace Game.Core.ActionGraph.Editor
                 }
             }
 
+            _rootData.LastPosition = contentViewContainer.transform.position;
+            
             EditorUtility.SetDirty(_rootData);
             AssetDatabase.SaveAssetIfDirty(_rootData);
         }
@@ -196,6 +182,8 @@ namespace Game.Core.ActionGraph.Editor
                     group.AddElement(actionNodes[groupNodeKey]);
                 }
             }
+            
+            UpdateViewTransform(_rootData.LastPosition, Vector3.one);
         }
 
         // public GraphSnapshotData SnapshotGraph()
@@ -260,8 +248,9 @@ namespace Game.Core.ActionGraph.Editor
             if (data == null)
             {
                 data = ScriptableObject.CreateInstance<ActionNodeData>();
-                data.name = _config.DefaultKeyNode;
-                data.Key = _config.DefaultKeyNode;
+                data.name = _config.DefaultTagNode;
+                data.Tag = _config.DefaultTagNode;
+                data.Key = Guid.NewGuid().ToString();
                 data.Position = position;
                 
                 _nodesToAdded.Add(data);
@@ -277,21 +266,35 @@ namespace Game.Core.ActionGraph.Editor
             
             node.SetPosition(new Rect(position, Vector2.one));
 
-            RegisterNode(node);
+            node.DeleteElementsRequestEvent += OnDeleteElements;
 
             return node;
         }
 
-        public void LookAt(string nodeKey)
+        public void LookAt(string value)
         {
-            foreach (var node in nodes)
+            foreach (var element in graphElements)
             {
-                if (node is ActionNode actionNode && actionNode.Key.Contains(nodeKey))
+                switch (element)
                 {
-                    UpdateViewTransform(contentViewContainer
-                        .ChangeCoordinatesTo(actionNode, viewport.contentRect.center - actionNode.contentRect.center), Vector3.one);
+                    case Group group when group.title.Contains(value):
+                    {
+                        LookAt(group);
+                        return;
+                    }
+                    case ActionNode node when node.Tag.Contains(value):
+                    {
+                        LookAt(node);
+                        return;
+                    }
                 }
             }
+        }
+
+        public void LookAt(VisualElement element)
+        {
+            UpdateViewTransform(contentViewContainer
+                .ChangeCoordinatesTo(element, viewport.contentRect.center - element.contentRect.center), Vector3.one);
         }
 
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)
@@ -332,75 +335,10 @@ namespace Game.Core.ActionGraph.Editor
             
             Insert(0, gridBackground);
         }
-
-        private void RegisterNode(ActionNode node)
-        {
-            node.ChangeKeyFunc += OnRevalidateKey;
-            node.DeleteElementsRequestEvent += OnDeleteElements;
-            
-            AddKeyToMap(node);
-        }
-
+        
         private void OnDeleteElements(List<GraphElement> elements)
         {
             DeleteElements(elements);
-        }
-
-        private void AddKeyToMap(ActionNode node, string key = null)
-        {
-            key ??= node.Key;
-            
-            if (_keysMap.ContainsKey(key))
-            {
-                if (_keysMap[key].Count == 1)
-                {
-                    _keysMap[key][0].SetBackgroundColor(_config.ErrorColor);
-                }
-                
-                _keysMap[key].Add(node);
-                
-                node.SetBackgroundColor(_config.ErrorColor);
-            }
-            else
-            {
-                _keysMap.Add(key, new List<ActionNode>() {node});
-            }
-        }
-
-        private void RemoveKeyFromMap(ActionNode node, string key = null)
-        {
-            key ??= node.Key;
-            
-            _keysMap[key].Remove(node);
-            
-            node.SetBackgroundColor(_config.DefaultColor);
-
-            switch (_keysMap[key].Count)
-            {
-                case 1:
-                {
-                    _keysMap[key][0].SetBackgroundColor(_config.DefaultColor);
-                    break;
-                }
-                case 0:
-                {
-                    _keysMap.Remove(key);
-                    break;
-                }
-            }
-        }
-
-        private string OnRevalidateKey(ActionNode node, string oldKey, string newKey)
-        {
-            if (_validator.TryValidate(newKey, out var result))
-            {
-                RemoveKeyFromMap(node, oldKey);
-                AddKeyToMap(node, result);
-
-                return result;
-            }
-
-            return _config.DefaultKeyNode;
         }
 
         private void SetGraphViewChangedCallback()
@@ -433,9 +371,7 @@ namespace Game.Core.ActionGraph.Editor
                             }
                             case ActionNode actionNode:
                             {
-                                actionNode.ChangeKeyFunc -= OnRevalidateKey;
                                 actionNode.DeleteElementsRequestEvent -= OnDeleteElements;
-                                RemoveKeyFromMap(actionNode);
                                 _nodesToRemove.Add(actionNode.Data);
                                 _nodesToAdded.Remove(actionNode.Data);
                                 break;

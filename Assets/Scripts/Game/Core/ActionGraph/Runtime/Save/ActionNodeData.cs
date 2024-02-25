@@ -9,6 +9,8 @@ namespace Game.Core.ActionGraph.Runtime
         [field: SerializeField,ReadOnly] public string Key { get; set; }
         [field: SerializeField,ReadOnly] public Vector2 Position {get; set; }
 
+        [field: SerializeField] public string Tag { get; set; }
+        
         [field: SerializeField, ListDrawerSettings(IsReadOnly = true)]
         public List<TransitionData> Transitions { get; set; } = new();
 

@@ -30,7 +30,7 @@ namespace Game.Core.ActionGraph.Editor
 
             _searchTextField = new TextField()
             {
-                label = "Search Node:",
+                label = "Search : ",
             };
 
             _searchTextField.RegisterValueChangedCallback(OnChangeSearchTextField);
