@@ -20,10 +20,10 @@ MonoBehaviour:
   - {fileID: 2273819165785895969}
   <LastPosition>k__BackingField:
     serializedVersion: 2
-    x: 464
-    y: 318
-    width: 0.25
-    height: 0.25
+    x: 40
+    y: 114
+    width: 0.43232757
+    height: 0.43232757
 --- !u!114 &2273819165785895969
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -41,14 +41,13 @@ MonoBehaviour:
   <Tag>k__BackingField: ta
   <Transitions>k__BackingField:
   - nodeKey: 
-    transitionPosition: 0
-    background: {fileID: 0}
-    title: 
   _command:
     rid: 1788503615788810242
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 1788503615788810242
       type: {class: TextCommand, ns: Game.Core.ActionGraph.Runtime, asm: Assembly-CSharp}
       data:
@@ -72,14 +71,13 @@ MonoBehaviour:
   <Tag>k__BackingField: node
   <Transitions>k__BackingField:
   - nodeKey: ebce7845-cae7-489f-862d-f2da7df90d41
-    transitionPosition: 0
-    background: {fileID: 0}
-    title: 
   _command:
     rid: 1788503615788810240
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 1788503615788810240
       type: {class: TextCommand, ns: Game.Core.ActionGraph.Runtime, asm: Assembly-CSharp}
       data:
@@ -103,14 +101,13 @@ MonoBehaviour:
   <Tag>k__BackingField: node
   <Transitions>k__BackingField:
   - nodeKey: cc7416a5-9e03-4843-9856-d36836181c7e
-    transitionPosition: 0
-    background: {fileID: 0}
-    title: 
   _command:
     rid: 1788503615788810241
   references:
     version: 2
     RefIds:
+    - rid: -2
+      type: {class: , ns: , asm: }
     - rid: 1788503615788810241
       type: {class: TextCommand, ns: Game.Core.ActionGraph.Runtime, asm: Assembly-CSharp}
       data:
