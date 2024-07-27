@@ -1,0 +1,16 @@
+{
+    "name": "Pragma.ActionGraph.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:ed00492cda1dede408c0e223db3e9d36"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

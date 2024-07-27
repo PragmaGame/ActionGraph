@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Threading;
-using ActionGraph.Runtime.Commands.Absrtract;
 using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace ActionGraph.Runtime.Commands.Implementation.Text
+namespace Pragma.ActionGraph.Runtime.Commands
 {
     [Serializable]
     public class TextCommand : IActionCommand

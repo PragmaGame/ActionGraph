@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 
-namespace ActionGraph.Runtime.Commands.Implementation.Container.Runners.Abstract
+namespace Pragma.ActionGraph.Runtime.Commands
 {
     public interface IProcessRunner
     {

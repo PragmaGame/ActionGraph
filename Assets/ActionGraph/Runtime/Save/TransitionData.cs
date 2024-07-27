@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ActionGraph.Runtime.Save
+namespace Pragma.ActionGraph.Runtime.Save
 {
     [Serializable]
     public class TransitionData

@@ -2,7 +2,7 @@
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace ActionGraph.Runtime.Save
+namespace Pragma.ActionGraph.Runtime.Save
 {
     [CreateAssetMenu(fileName = nameof(ActionGraphData), menuName = "ActionGraph/" + nameof(ActionGraphData))]
     public class ActionGraphData : ScriptableObject

@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 
-namespace ActionGraph.Runtime.Commands.Absrtract
+namespace Pragma.ActionGraph.Runtime.Commands
 {
     public interface IActionCommand
     {

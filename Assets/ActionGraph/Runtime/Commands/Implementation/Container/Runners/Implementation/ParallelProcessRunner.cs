@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using ActionGraph.Runtime.Commands.Implementation.Container.Runners.Abstract;
 using Cysharp.Threading.Tasks;
 
-namespace ActionGraph.Runtime.Commands.Implementation.Container.Runners.Implementation
+namespace Pragma.ActionGraph.Runtime.Commands
 {
     [Serializable]
     public class ParallelProcessRunner : IProcessRunner

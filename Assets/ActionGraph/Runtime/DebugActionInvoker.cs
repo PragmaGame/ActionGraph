@@ -2,7 +2,7 @@
 using UnityEngine;
 using Zenject;
 
-namespace ActionGraph.Runtime
+namespace Pragma.ActionGraph.Runtime
 {
     public class DebugActionInvoker : MonoBehaviour
     {

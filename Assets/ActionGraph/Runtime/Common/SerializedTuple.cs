@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ActionGraph.Runtime.Common
+namespace Pragma.ActionGraph.Runtime.Common
 {
     [Serializable]
     public class SerializedTuple<TValue1, TValue2>

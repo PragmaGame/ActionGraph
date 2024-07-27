@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace ActionGraph.Runtime.Save
+namespace Pragma.ActionGraph.Runtime.Save
 {
     [Serializable]
     public class GroupData
