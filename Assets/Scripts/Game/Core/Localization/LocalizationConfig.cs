@@ -48,7 +48,7 @@ namespace Game.Core.Localization
             return languageIndex == -1 ? string.Empty : _localizations[key][languageIndex];
         }
     }
-    
+
     [Serializable]
     public class LocalizationDictionary : SerializedDictionary<string, List<string>>
     {

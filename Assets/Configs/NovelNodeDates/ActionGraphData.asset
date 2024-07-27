@@ -1,39 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-4345447546446754601
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e81e533a681e49f09fc0a86dc1b6476d, type: 3}
-  m_Name: node
-  m_EditorClassIdentifier: 
-  <Key>k__BackingField: d6b08c93-f68a-434a-a809-5ae8d48684ff
-  <Position>k__BackingField: {x: 713, y: 427}
-  <Tag>k__BackingField: node
-  <Transitions>k__BackingField:
-  - nodeKey: cc7416a5-9e03-4843-9856-d36836181c7e
-    transitionPosition: 1
-    background: {fileID: 0}
-    title: 
-  _command:
-    rid: 1788503574153003050
-  references:
-    version: 2
-    RefIds:
-    - rid: 1788503574153003050
-      type: {class: ContainerCommand, ns: Game.Core.ActionGraph.Runtime, asm: Assembly-CSharp}
-      data:
-        _runner:
-          rid: 1788503574153003051
-        _commands: []
-    - rid: 1788503574153003051
-      type: {class: ParallelProcessRunner, ns: Game.Core.ActionGraph.Runtime, asm: Assembly-CSharp}
-      data: 
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -51,9 +17,13 @@ MonoBehaviour:
   _nodes:
   - {fileID: 2424483363244050596}
   - {fileID: 4988705892449425327}
-  - {fileID: -4345447546446754601}
   - {fileID: 2273819165785895969}
-  <LastPosition>k__BackingField: {x: 740, y: 441}
+  <LastPosition>k__BackingField:
+    serializedVersion: 2
+    x: 464
+    y: 318
+    width: 0.25
+    height: 0.25
 --- !u!114 &2273819165785895969
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -71,23 +41,20 @@ MonoBehaviour:
   <Tag>k__BackingField: ta
   <Transitions>k__BackingField:
   - nodeKey: 
-    transitionPosition: 1
+    transitionPosition: 0
     background: {fileID: 0}
     title: 
   _command:
-    rid: 1788503574153003052
+    rid: 1788503615788810242
   references:
     version: 2
     RefIds:
-    - rid: 1788503574153003052
-      type: {class: ContainerCommand, ns: Game.Core.ActionGraph.Runtime, asm: Assembly-CSharp}
+    - rid: 1788503615788810242
+      type: {class: TextCommand, ns: Game.Core.ActionGraph.Runtime, asm: Assembly-CSharp}
       data:
-        _runner:
-          rid: 1788503574153003053
-        _commands: []
-    - rid: 1788503574153003053
-      type: {class: ParallelProcessRunner, ns: Game.Core.ActionGraph.Runtime, asm: Assembly-CSharp}
-      data: 
+        _textKey: fine
+        _speakerName: 
+        _debugText: 
 --- !u!114 &2424483363244050596
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -105,27 +72,20 @@ MonoBehaviour:
   <Tag>k__BackingField: node
   <Transitions>k__BackingField:
   - nodeKey: ebce7845-cae7-489f-862d-f2da7df90d41
-    transitionPosition: 1
-    background: {fileID: 0}
-    title: 
-  - nodeKey: d6b08c93-f68a-434a-a809-5ae8d48684ff
-    transitionPosition: 1
+    transitionPosition: 0
     background: {fileID: 0}
     title: 
   _command:
-    rid: 1788503574153003046
+    rid: 1788503615788810240
   references:
     version: 2
     RefIds:
-    - rid: 1788503574153003046
-      type: {class: ContainerCommand, ns: Game.Core.ActionGraph.Runtime, asm: Assembly-CSharp}
+    - rid: 1788503615788810240
+      type: {class: TextCommand, ns: Game.Core.ActionGraph.Runtime, asm: Assembly-CSharp}
       data:
-        _runner:
-          rid: 1788503574153003047
-        _commands: []
-    - rid: 1788503574153003047
-      type: {class: ParallelProcessRunner, ns: Game.Core.ActionGraph.Runtime, asm: Assembly-CSharp}
-      data: 
+        _textKey: hello
+        _speakerName: 
+        _debugText: 
 --- !u!114 &4988705892449425327
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -139,24 +99,21 @@ MonoBehaviour:
   m_Name: node
   m_EditorClassIdentifier: 
   <Key>k__BackingField: ebce7845-cae7-489f-862d-f2da7df90d41
-  <Position>k__BackingField: {x: 713, y: 134}
+  <Position>k__BackingField: {x: 681, y: 266}
   <Tag>k__BackingField: node
   <Transitions>k__BackingField:
   - nodeKey: cc7416a5-9e03-4843-9856-d36836181c7e
-    transitionPosition: 1
+    transitionPosition: 0
     background: {fileID: 0}
     title: 
   _command:
-    rid: 1788503574153003048
+    rid: 1788503615788810241
   references:
     version: 2
     RefIds:
-    - rid: 1788503574153003048
-      type: {class: ContainerCommand, ns: Game.Core.ActionGraph.Runtime, asm: Assembly-CSharp}
+    - rid: 1788503615788810241
+      type: {class: TextCommand, ns: Game.Core.ActionGraph.Runtime, asm: Assembly-CSharp}
       data:
-        _runner:
-          rid: 1788503574153003049
-        _commands: []
-    - rid: 1788503574153003049
-      type: {class: ParallelProcessRunner, ns: Game.Core.ActionGraph.Runtime, asm: Assembly-CSharp}
-      data: 
+        _textKey: how-are-you
+        _speakerName: 
+        _debugText: 

@@ -12,7 +12,7 @@ namespace Game.Core.ActionGraph.Runtime
         [ReadOnly, SerializeField] private List<GroupData> _groups;
         [ReadOnly, SerializeField] private List<ActionNodeData> _nodes;
 
-        [field: SerializeField, ReadOnly] public Vector2 LastPosition { get; set; }
+        [field: SerializeField, ReadOnly] public Rect LastPosition { get; set; }
         
         public List<ActionNodeData> Nodes => _nodes;
         public List<GroupData> Groups => _groups;

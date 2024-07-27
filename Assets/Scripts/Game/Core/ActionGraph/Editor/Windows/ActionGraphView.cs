@@ -86,7 +86,7 @@ namespace Game.Core.ActionGraph.Editor
                 }
             }
 
-            _rootData.LastPosition = contentViewContainer.transform.position;
+            _rootData.LastPosition = new Rect(contentViewContainer.transform.position, contentViewContainer.transform.scale);
             
             EditorUtility.SetDirty(_rootData);
             AssetDatabase.SaveAssetIfDirty(_rootData);
@@ -183,7 +183,7 @@ namespace Game.Core.ActionGraph.Editor
                 }
             }
             
-            UpdateViewTransform(_rootData.LastPosition, Vector3.one);
+            UpdateViewTransform(_rootData.LastPosition.position, _rootData.LastPosition.size);
         }
 
         // public GraphSnapshotData SnapshotGraph()
